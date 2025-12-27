@@ -1,19 +1,28 @@
 @import "tailwindcss";
-.container {
+
+.Container {
     width: 1200px;
     height: auto;
     margin: auto;
 }
-.main-bg{
+
+.main-bg {
     background: linear-gradient(135deg, #4758E8, #720AB8);
 }
-.uzb-bg{
+
+.uzb-bg {
     background: linear-gradient(#1e90ff, #fff, #00ff00);
 }
-.rus-bg{
+
+.rus-bg {
     background: linear-gradient(white, blue, red);
 }
-.eng-bg{
+
+.eng-bg {
     background: linear-gradient(135deg, blue, blue, #BC0B3C, white, #BC0B3C, white, #BC0B3C, white, #BC0B3C);
 }
 
+/* .circle {
+    background: conic-gradient(red 0 25%,blue 25% 55%,green 55% 100%);
+    border-radius: 50%;
+} */

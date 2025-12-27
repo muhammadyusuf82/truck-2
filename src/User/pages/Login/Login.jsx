@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom';
 import {
   FaTruckLoading,
   FaFacebook,
@@ -15,9 +16,9 @@ import {
 import { RiCheckboxCircleFill } from "react-icons/ri";
 const Login = () => {
   const [counter, setCounter] = useState(0)
-  const [job, setJob] = useState('')
+  const [job, setJob] = useState(0)
   const [login, setLogin] = useState(true)
-  const [language, setLanguage] = useState(localStorage.getItem("language") || '')
+  const [language, setLanguage] = useState(localStorage.getItem("language") || 'uz')
 
   const translations = {
     uz: {
@@ -51,7 +52,9 @@ const Login = () => {
       addable:"Keyinchalik to'ldirishingiz mumkin",
       placeholder_1:'Parolingizni kiriting',
       place_holder_2:'Parolingizni tasdiqlang',
-      document: 'Haydovchilik guvohnomasi raqami'
+      document: 'Haydovchilik guvohnomasi raqami',
+      role_1: "Yuk Beruvchi",
+      role_2: "Haydovchi"
     },
   
     ru: {
@@ -85,7 +88,9 @@ const Login = () => {
       addable:"Можно заполнить позже",
       placeholder_1:'Введите пароль',
       place_holder_2:'Подтвердите пароль',
-      document: 'Номер водительских прав'
+      document: 'Номер водительских прав',
+      role_1: "Отправитель Груза",
+      role_2: "Водитель"
     },
   
     en: {
@@ -120,7 +125,9 @@ const Login = () => {
       addable:"Can be filled later",
       placeholder_1:'Enter your password',
       place_holder_2:'Confirm your password',
-      document: 'Driving license number'
+      document: 'Driving license number',
+      role_1: "Shipper",
+      role_2: "Carrier"
     },
   };
 
@@ -147,7 +154,7 @@ const Login = () => {
             <h1 className='text-3xl font-medium text-zinc-800'>{t("welcome")}</h1>
             <p className='py-5 text-zinc-600'>{t("welcomeText")}</p>
           </div>
-          <div onClick={() => setJob('Yuk Beruvchi')} className={job == "Yuk Beruvchi" ? "flex px-4 justify-center border-blue-700 cursor-pointer items-center gap-x-3 md:gap-x-6 border-2 hover:border-blue-700 transition-all duration-300 hover:-translate-y-1 rounded-2xl mx-5 py-5" : "flex justify-center cursor-pointer items-center gap-x-3 md:gap-x-6 border-2 border-zinc-200 hover:border-blue-700 transition-all duration-300 hover:-translate-y-1 rounded-2xl mx-5 px-4 py-5"}>
+          <div onClick={() => setJob(1)} className={job == 1 ? "flex px-4 justify-center border-blue-700 cursor-pointer items-center gap-x-3 md:gap-x-6 border-2 hover:border-blue-700 transition-all duration-300 hover:-translate-y-1 rounded-2xl mx-5 py-5" : "flex justify-center cursor-pointer items-center gap-x-3 md:gap-x-6 border-2 border-zinc-200 hover:border-blue-700 transition-all duration-300 hover:-translate-y-1 rounded-2xl mx-5 px-4 py-5"}>
             <p className='p-3 bg-blue-600 rounded-xl'><FaBox className='text-white text-xl' /></p>
             <div className=''>
               <h1 className='text-lg'>{t("sender")}</h1>
@@ -155,7 +162,7 @@ const Login = () => {
             </div>
             <p><FaAngleRight className='text-2xl text-zinc-800' /></p>
           </div>
-          <div onClick={() => setJob('Haydovchi')} className={job == 'Haydovchi' ? "flex justify-center px-4 cursor-pointer items-center gap-x-3 md:gap-x-6 border-2 border-blue-700 hover:border-blue-700 transition-all duration-300 hover:-translate-y-1 rounded-2xl mx-5 py-5 my-3" : "flex justify-center px-4 cursor-pointer items-center gap-x-3 md:gap-x-6 border-2 border-zinc-200 hover:border-blue-700 transition-all duration-300 hover:-translate-y-1 rounded-2xl mx-5 py-5 my-3"}>
+          <div onClick={() => setJob(2)} className={job == 2 ? "flex justify-center px-4 cursor-pointer items-center gap-x-3 md:gap-x-6 border-2 border-blue-700 hover:border-blue-700 transition-all duration-300 hover:-translate-y-1 rounded-2xl mx-5 py-5 my-3" : "flex justify-center px-4 cursor-pointer items-center gap-x-3 md:gap-x-6 border-2 border-zinc-200 hover:border-blue-700 transition-all duration-300 hover:-translate-y-1 rounded-2xl mx-5 py-5 my-3"}>
             <p className='p-3 bg-purple-700 rounded-xl'><FaTruck className='text-white text-xl' /></p>
             <div className=''>
               <h1 className='text-lg'>{t("driver")}</h1>
@@ -230,7 +237,7 @@ const Login = () => {
 
       <form className={counter == 2 ? "lg:w-2/5 md:w-3/5 sm:w-4/5 m-auto" : "hidden"}>
         <div className='rounded-t-2xl main-bg text-center px-5 py-6 text-white'>
-          <span className='text-center bg-white/30 py-2 px-4 rounded-full'><FaUser className='inline my-4 mx-1' />{job}</span>
+          <span className='text-center bg-white/30 py-2 px-4 rounded-full'><FaUser className='inline my-4 mx-1' />{job==1 ? `${t("role_1")}`:`${t("role_2")}`}</span>
           <div className="flex justify-evenly items-center py-5">
             <button onClick={() => setCounter(counter - 1)} className='p-3 rounded-xl bg-white/20 hover:bg-white/40 hover:-translate-x-1 transition-all duration-200'><FaArrowLeft /></button>
             <h1 className='text-3xl items-center flex justify-center'><span className='p-2 mx-2 bg-white/20 rounded-2xl'><FaTruckLoading className='inline mx-2' /></span> Yuk.uz</h1>
@@ -262,14 +269,16 @@ const Login = () => {
               <p className='text-xs text-zinc-500 py-2'>{t('addable')}</p>
             </div>
             <p className='py-2 text-sm font-medium text-zinc-800'>{t('password')}</p>
-            <input required type="text" placeholder={t('placeholder_1')} className='outline-0 border border-zinc-300 rounded-xl p-3 w-[99%]' />
+            <input required type="password" placeholder={t('placeholder_1')} className='outline-0 border border-zinc-300 rounded-xl p-3 w-[99%]' />
             <div className={login ? 'hidden' : ''}>
               <p className='py-2 text-sm font-medium text-zinc-800'>{t('confirmPassword')}</p>
-              <input required type="text" placeholder={t('place_holder_2')} className='outline-0 border border-zinc-300 rounded-xl p-3 w-[99%]' />
+              <input required type="password" placeholder={t('place_holder_2')} className='outline-0 border border-zinc-300 rounded-xl p-3 w-[99%]' />
             </div>
             <a href='#' className={login ? 'underline text-xs font-medium text-blue-700' : 'hidden'}>{t('forgotPassword')}</a>
             <div className='flex my-2 justify-center rounded-xl bg-blue-700 transition-all duration-200 hover:-translate-y-1'>
-              <button type='submit' className='flex items-center gap-x-2 py-4 text-white'><FaArrowRight className='inline' />{t('login')}</button>
+              <Link to={'/freight'}>
+              <button type='submit' className='flex items-center gap-x-2 py-4 text-white'><FaArrowRight className='inline' />{login ? `${t('login')}`:`${t('register')}`}</button>
+              </Link>
             </div>
             <div className="flex justify-center items-center gap-x-3">
               <div className="bg-zinc-300 h-0.5 w-2/3"></div>
