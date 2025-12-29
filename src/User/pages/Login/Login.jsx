@@ -35,8 +35,8 @@ const Login = () => {
       loginText: "Akkauntingizga kirish uchun telefon raqamingizni kiriting",
       chooseLang: "Tilni tanlang",
       chooseLangText:
-      "Qaysi tilda foydalanmoqchisiz?\nKeyinchalik sozlamalardan o'zgartirishingiz mumkin.",
-      
+        "Qaysi tilda foydalanmoqchisiz?\nKeyinchalik sozlamalardan o'zgartirishingiz mumkin.",
+
       register: "Ro'yxatdan o'tish",
       registerText: `Yangi ${job} sifatida ro'yxatdan o'tish`,
       phone: "Telefon raqami",
@@ -49,14 +49,14 @@ const Login = () => {
       agreeText_2: "Foydalanish Shartlari",
       and: 'va',
       agreeText_3: "Maxfiylik Siyosati",
-      addable:"Keyinchalik to'ldirishingiz mumkin",
-      placeholder_1:'Parolingizni kiriting',
-      place_holder_2:'Parolingizni tasdiqlang',
+      addable: "Keyinchalik to'ldirishingiz mumkin",
+      placeholder_1: 'Parolingizni kiriting',
+      place_holder_2: 'Parolingizni tasdiqlang',
       document: 'Haydovchilik guvohnomasi raqami',
       role_1: "Yuk Beruvchi",
       role_2: "Haydovchi"
     },
-  
+
     ru: {
       slogan: "Платформа грузоперевозок №1 в Узбекистане",
       welcome: "Добро пожаловать!",
@@ -73,7 +73,7 @@ const Login = () => {
       chooseLang: "Выберите язык",
       chooseLangText:
         "На каком языке вы хотите пользоваться?\nПозже можно изменить в настройках.",
-  
+
       register: "Регистрация",
       registerText: `Войти в качестве нового ${job}`,
       phone: "Номер телефона",
@@ -85,14 +85,14 @@ const Login = () => {
       agreeText_2: "Условиями Использования",
       and: 'и',
       agreeText_3: "Политикой Конфиденциальности",
-      addable:"Можно заполнить позже",
-      placeholder_1:'Введите пароль',
-      place_holder_2:'Подтвердите пароль',
+      addable: "Можно заполнить позже",
+      placeholder_1: 'Введите пароль',
+      place_holder_2: 'Подтвердите пароль',
       document: 'Номер водительских прав',
       role_1: "Отправитель Груза",
       role_2: "Водитель"
     },
-  
+
     en: {
       slogan: "uzekistan’s #1 Freight Platform",
       welcome: "Welcome!",
@@ -109,7 +109,7 @@ const Login = () => {
       chooseLang: "Choose language",
       chooseLangText:
         "Which language would you like to use?\nYou can change it later in settings.",
-  
+
       register: "Sign up",
       registerText: `Register as a new ${job}`,
       phone: "Phone number",
@@ -119,12 +119,12 @@ const Login = () => {
       or: "Or",
       agreeText_1:
         "By continuing, you agree to the",
-      agreeText_2:'Terms of Service',
+      agreeText_2: 'Terms of Service',
       and: 'and',
-      agreeText_3:'Privacy Policy',
-      addable:"Can be filled later",
-      placeholder_1:'Enter your password',
-      place_holder_2:'Confirm your password',
+      agreeText_3: 'Privacy Policy',
+      addable: "Can be filled later",
+      placeholder_1: 'Enter your password',
+      place_holder_2: 'Confirm your password',
       document: 'Driving license number',
       role_1: "Shipper",
       role_2: "Carrier"
@@ -237,7 +237,7 @@ const Login = () => {
 
       <form className={counter == 2 ? "lg:w-2/5 md:w-3/5 sm:w-4/5 m-auto" : "hidden"}>
         <div className='rounded-t-2xl main-bg text-center px-5 py-6 text-white'>
-          <span className='text-center bg-white/30 py-2 px-4 rounded-full'><FaUser className='inline my-4 mx-1' />{job==1 ? `${t("role_1")}`:`${t("role_2")}`}</span>
+          <span className='text-center bg-white/30 py-2 px-4 rounded-full'><FaUser className='inline my-4 mx-1' />{job == 1 ? `${t("role_1")}` : `${t("role_2")}`}</span>
           <div className="flex justify-evenly items-center py-5">
             <button onClick={() => setCounter(counter - 1)} className='p-3 rounded-xl bg-white/20 hover:bg-white/40 hover:-translate-x-1 transition-all duration-200'><FaArrowLeft /></button>
             <h1 className='text-3xl items-center flex justify-center'><span className='p-2 mx-2 bg-white/20 rounded-2xl'><FaTruckLoading className='inline mx-2' /></span> Yuk.uz</h1>
@@ -277,7 +277,7 @@ const Login = () => {
             <a href='#' className={login ? 'underline text-xs font-medium text-blue-700' : 'hidden'}>{t('forgotPassword')}</a>
             <div className='flex my-2 justify-center rounded-xl bg-blue-700 transition-all duration-200 hover:-translate-y-1'>
               <Link to={'/freight'}>
-              <button type='submit' className='flex items-center gap-x-2 py-4 text-white'><FaArrowRight className='inline' />{login ? `${t('login')}`:`${t('register')}`}</button>
+                <button type='submit' className='flex items-center gap-x-2 py-4 text-white'><FaArrowRight className='inline' />{login ? `${t('login')}` : `${t('register')}`}</button>
               </Link>
             </div>
             <div className="flex justify-center items-center gap-x-3">

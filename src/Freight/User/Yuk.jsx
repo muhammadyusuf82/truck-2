@@ -34,7 +34,7 @@ const Yuk = () => {
             <img src={chart_img} className='h-80 w-[97%]' alt="" />
           </div>
         </div>
-
+        
         <div className="cards max-sm:mx-3">
 
           <div className="flex max-sm:flex-col justify-center gap-4 py-3">
