@@ -6,6 +6,7 @@ import Home from './User/pages/Home/Home'
 import Yuk from './Freight/User/Yuk'
 import ProfileSetup from './User/pages/Login/ProfileSetup'
 import FreightHome from './Freight/User/Home'
+import Haydovchilar from './Freight/User/Haydovchilar'
 function App() {
   return (
     <>
@@ -14,6 +15,7 @@ function App() {
       <Route path='/login' element={<Login/>}/>
       <Route path='/freight/asosiy' element={<FreightHome/>}/>
       <Route path='/freight/yuk' element={<Yuk/>}/>
+      <Route path='/freight/haydovchilar' element={<Haydovchilar/>}/>
       <Route path='/profile-setup' element={<ProfileSetup/>}/>
     </Routes>
       {/* <Home/> */}

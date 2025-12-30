@@ -15,11 +15,11 @@ const Navbar = () => {
         <ul className='hidden lg:flex list-none gap-6 items-center'>
           <NavLink to='/freight/asosiy' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Asosiy</NavLink>
           <NavLink to='/freight/yuk' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Yuklar</NavLink>
-          <li className='font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Haydovchilar</li>
+          <NavLink to='/freight/haydovchilar' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Haydovchilar</NavLink>
           <li className='font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Xarita</li>
           <li className='font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Narxlar</li>
           <li className='font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Yordam</li>
-          <li className='text-2xl bg-linear-to-br from-[#4361ee] to-[#7209b7] text-white py-2 px-2.5 cursor-pointer rounded-full'>AS</li>
+          <NavLink to={'/profile-setup'} className='text-2xl bg-linear-to-br from-[#4361ee] to-[#7209b7] text-white py-2 px-2.5 cursor-pointer rounded-full'>AS</NavLink>
         </ul>
         <div className="lg:hidden text-2xl text-[#4361ee] cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <FaTimes /> : <FaBars />}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+// import { Link } from 'react-router-dom';
 import { FaTruckLoading } from 'react-icons/fa'
 import { FaCamera } from "react-icons/fa";
 import { FaArrowLeft } from "react-icons/fa6";
@@ -12,9 +13,14 @@ import { FaBox } from "react-icons/fa";
 import { BsFillFuelPumpFill } from "react-icons/bs";
 const ProfileSetup = () => {
   const [counter, setCounter] = useState(0)
+  const [volume, setVolume] = useState(0)
+  const [document, setDocument] = useState('')
+  const [state, setState] = useState('Tanlang')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [transportType, setTransportType] = useState('')
+  const [address, setAddress] = useState('')
+  const [eAddress, setEAddress] = useState('')
   const [image, setImage] = useState(null);
   const handleChange = (e) => {
     const file = e.target.files[0];
@@ -34,12 +40,10 @@ const ProfileSetup = () => {
         <div className="rounded-b-2xl bg-white w-3/4 md:w-5/9 lg:w-4/9 m-auto py-5 px-5 md:px-8">
           <div className="flex justify-around relative items-center">
             <p className='absolute h-1 rounded-2xl w-9/10 bg-gray-200'></p>
-            <p className={`rounded-full text-lg text-white border-gray-300 ${counter > 0 ? 'bg-sky-500 p-1' : 'bg-blue-700 px-3 py-1'} z-10`}>1{counter > 0 ? <GiCheckMark className='inline' /> : ''}</p>
-            <p className={`rounded-full border-2 text-lg border-gray-300 z-10 ${counter > 2 ? 'bg-sky-500 p-1' : counter === 2 ? 'bg-blue-700 px-4 py-1' : 'border-gray-300 px-3 py-1 bg-white text-gray-500'}`}>
-              3{counter > 2 ? <GiCheckMark className="inline" /> : ''}
-            </p>
-            <p className={`rounded-full text-lg text-white border-gray-300 ${counter > 2 ? 'bg-sky-500 p-1' : 'bg-blue-700 px-3 py-1'} z-10`}>3{counter > 2 ? <GiCheckMark className='inline' /> : ''}</p>
-            <p className={`rounded-full text-lg text-white border-gray-300 ${counter > 3 ? 'bg-sky-500 p-1' : 'bg-blue-700 px-3 py-1'} z-10`}>4{counter > 3 ? <GiCheckMark className='inline' /> : ''}</p>
+            <p className={`rounded-full text-lg z-10 ${counter > 0 ? 'bg-sky-500 p-1 text-white' : counter < 0 ?  'border-gray-300 px-3 py-1 border-2 bg-white text-gray-500' : 'bg-blue-700 px-3 py-1 text-white'}`}>1{counter > 0 ? <GiCheckMark className="inline" /> : ''}</p>
+            <p className={`rounded-full text-lg z-10 ${counter > 1 ? 'bg-sky-500 p-1 text-white' : counter < 1 ?  'border-gray-300 px-3 py-1 border-2 bg-white text-gray-500' : 'bg-blue-700 px-3 py-1 text-white'}`}>2{counter > 1 ? <GiCheckMark className="inline" /> : ''}</p>
+            <p className={`rounded-full text-lg z-10 ${counter > 2 ? 'bg-sky-500 p-1 text-white' : counter < 2 ?  'border-gray-300 px-3 py-1 border-2 bg-white text-gray-500' : 'bg-blue-700 px-3 py-1 text-white'}`}>3{counter > 2 ? <GiCheckMark className="inline" /> : ''}</p>
+            <p className={`rounded-full text-lg z-10 ${counter > 3 ? 'bg-sky-500 p-1 text-white' : counter < 3 ?  'border-gray-300 px-3 py-1 border-2 bg-white text-gray-500' : 'bg-blue-700 px-3 py-1 text-white'}`}>4{counter > 3 ? <GiCheckMark className="inline" /> : ''}</p>
           </div>
           <div className="flex justify-around py-2">
             <p className={`text-xs translate-x-1 ${counter == 0 ? 'text-blue-700' : ''}`}>Asosiy</p>
@@ -91,28 +95,28 @@ const ProfileSetup = () => {
             </div>
             <div className='flex flex-col gap-y-3 mb-4'>
               <p>Elektron pochta</p>
-              <input type="email" className='p-3 outline-0 border-gray-300 border-2 rounded-xl' placeholder='email@example.com' />
+              <input onChange={(e)=>setEAddress(e.target.value)} type="email" className='p-3 outline-0 border-gray-300 border-2 rounded-xl' placeholder='email@example.com' />
             </div>
             <div className='flex flex-col gap-y-3 my-4'>
               <p>Asosiy manzil *</p>
-              <input type="text" className='p-3 outline-0 border-gray-300 border-2 rounded-xl' placeholder='Manzilingiz' />
+              <input onChange={(e)=>setAddress(e.target.value)} type="text" className='p-3 outline-0 border-gray-300 border-2 rounded-xl' placeholder='Manzilingiz' />
             </div>
             <div className='sm:grid gap-x-3 grid-cols-2 my-5'>
               <div className='max-sm:my-6'>
                 <p>Shahar *</p>
-                <select name="" id="" className='w-full outline-0 p-3 rounded-xl border-2 border-gray-300'>
-                  <option value="">Tanlang</option>
-                  <option value="">Toshkent</option>
-                  <option value="">Samarqand</option>
-                  <option value="">Buxoro</option>
-                  <option value="">Andijon</option>
-                  <option value="">Farg'ona</option>
-                  <option value="">Namangan</option>
-                  <option value="">Qarshi</option>
-                  <option value="">Navoiy</option>
-                  <option value="">Jizzax</option>
-                  <option value="">Xorazm</option>
-                  <option value="">Nukus</option>
+                <select onChange={(e)=>setState(e.target.value)} name="" id="" className='w-full outline-0 p-3 rounded-xl border-2 border-gray-300'>
+                  <option value="Tanlang">Tanlang</option>
+                  <option value="Toshkent">Toshkent</option>
+                  <option value="Samarqand">Samarqand</option>
+                  <option value="Buxoro">Buxoro</option>
+                  <option value="Andijon">Andijon</option>
+                  <option value="Farg'ona">Farg'ona</option>
+                  <option value="Namangan">Namangan</option>
+                  <option value="Qarshi">Qarshi</option>
+                  <option value="Navoiy">Navoiy</option>
+                  <option value="Jizzax">Jizzax</option>
+                  <option value="Xorazm">Xorazm</option>
+                  <option value="Nukus">Nukus</option>
                 </select>
               </div>
               <div className='max-sm:my-6'>
@@ -128,9 +132,9 @@ const ProfileSetup = () => {
             <div className="flex justify-between">
               <button onClick={() => counter > 0 ? setCounter(counter - 1) : ''} className={`border-2 font-medium  ${counter == 0 ? 'cursor-not-allowed border-gray-400 text-gray-400' : 'cursor-pointer '} flex items-center gap-x-2 md:px-5 px-3 py-3 rounded-xl`}><FaArrowLeft /> Orqaga</button>
               <button onClick={() => {
-                if ((firstName != '' && lastName != '') && counter < 5) {
+                if ((address != '' && eAddress != '' && state != 'Tanlang') && counter < 5) {
                   return setCounter(counter + 1)
-                } else { alert('Iltimos, Ism va Familiyangizni kiriting') }
+                } else { alert('Iltimos, manzil va shaharni kiriting') }
               }} className='bg-blue-700 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 font-medium text-white flex items-center gap-x-2 md:px-5 px-3 py-3 rounded-xl cursor-pointer'>Keyingi <FaArrowRight /></button>
             </div>
           </div>
@@ -141,7 +145,7 @@ const ProfileSetup = () => {
             </div>
             <div className="flex flex-col gap-y-3">
               <p className='text-sm font-medium'>Haydovchilik guvohnomasi raqami *</p>
-              <input className='border-2 border-gray-300 outline-blue-700 p-3 rounded-xl' type="text" placeholder='AA 1234567' />
+              <input onChange={(e)=>setDocument(e.target.value)} className='border-2 border-gray-300 outline-blue-700 p-3 rounded-xl' type="text" placeholder='AA 1234567' />
               <p>Guvohnoma amal qilish muddati *</p>
               <input className='border-2 border-gray-300 outline-blue-700 p-3 rounded-xl' type="date" name="" id="" />
               <p>Transport turi *</p>
@@ -156,7 +160,7 @@ const ProfileSetup = () => {
             <div className="grid grid-cols-2 my-8 gap-x-2">
               <div>
                 <p>Yuk sig'imi (kg) *</p>
-                <input type="number" className='border-2 border-gray-300 my-1 outline-0 p-3 rounded-xl w-full' />
+                <input onChange={(e)=>setVolume(e.target.value)} type="number" className='border-2 border-gray-300 my-1 outline-0 p-3 rounded-xl w-full' />
               </div>
               <div>
                 <p>Mashina raqami</p>
@@ -167,39 +171,43 @@ const ProfileSetup = () => {
             <div className="flex justify-between">
               <button onClick={() => counter > 0 ? setCounter(counter - 1) : ''} className={`border-2 font-medium  ${counter == 0 ? 'cursor-not-allowed border-gray-400 text-gray-400' : 'cursor-pointer '} flex items-center gap-x-2 md:px-5 px-3 py-3 rounded-xl`}><FaArrowLeft /> Orqaga</button>
               <button onClick={() => {
-                if ((firstName != '' && lastName != '') && counter < 5) {
+                if ((document != '' && volume != '') && counter < 5) {
                   return setCounter(counter + 1)
-                } else { alert('Iltimos, Ism va Familiyangizni kiriting') }
+                } else { alert("Iltimos, majburiy ma'lumotlarni kiriting") }
               }} className='bg-blue-700 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 font-medium text-white flex items-center gap-x-2 md:px-5 px-3 py-3 rounded-xl cursor-pointer'>Keyingi <FaArrowRight /></button>
             </div>
           </div>
           <div className={counter == 3 ? '' : 'hidden'}>
             <div className="py-8">
-              <h1>Ma'lumotlarni tasdiqlash</h1>
+              <h1 className='text-xl'>Ma'lumotlarni tasdiqlash</h1>
               <p>Kiritgan ma'lumotlaringizni tekshiring va tasdiqlang.</p>
             </div>
             <div className="bg-gray-100 p-5 rounded-xl">
               <h1 className='text-blue-700 text-xl'>Profil ma'lumotlari</h1>
-              <p className='font-bold'>Ism: <span className='font-normal'>{firstName}</span></p>
-              <p className='font-bold'>Elektron pochta: <span ></span></p>
-              <p className='font-bold'>Manzil: <span ></span></p>
-              <p className='font-bold'>Guvohnoma raqami</p>
-              <p className='font-bold'>Transport turi: <span >{transportType}</span></p>
-              <p className='font-bold'>Sig'im: <span ></span></p>
+              <p className='font-bold'>Ism: <span className='font-normal'>{firstName} {lastName}</span></p>
+              <p className='font-bold'>Elektron pochta: <span className='font-normal'>{eAddress}</span></p>
+              <p className='font-bold'>Manzil: <span className='font-normal'>{state},{address}</span></p>
+              <p className='font-bold'>Guvohnoma raqami: <span className='font-normal'>{document}</span></p>
+              <p className='font-bold'>Transport turi: <span className='font-normal'>{transportType}</span></p>
+              <p className='font-bold'>Sig'im: <span className='font-normal'>{volume}</span></p>
             </div>
             <div className='my-5 flex gap-x-2 text-sm font-medium'>
               <input type="checkbox" name="" id="" /> <span>Men</span> <a href="#" className='underline text-blue-700'>Foydalanish shartlari</a> <span>va</span> <a href="#" className='text-blue-700 underline'>Maxfiylik siyosati</a> <span>ga roziman</span>
             </div>
             <div className="flex justify-between">
               <button onClick={() => counter > 0 ? setCounter(counter - 1) : ''} className={`border-2 font-medium  ${counter == 0 ? 'cursor-not-allowed border-gray-400 text-gray-400' : 'cursor-pointer '} flex items-center gap-x-2 md:px-5 px-3 py-3 rounded-xl`}><FaArrowLeft /> Orqaga</button>
+              <Link to={'/freight/asosiy'}>
               <button onClick={() => {
                 if ((firstName != '' && lastName != '') && counter < 5) {
                   return setCounter(counter + 1)
                 } else { alert('Iltimos, Ism va Familiyangizni kiriting') }
-              }} className='bg-blue-700 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 font-medium text-white flex items-center gap-x-2 md:px-5 px-3 py-3 rounded-xl cursor-pointer'>Saqlash</button>
+              }} className='bg-blue-700 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 font-medium text-white flex items-center gap-x-2 md:px-5 px-3 py-3 rounded-xl cursor-pointer'>
+                Saqlash
+              </button>
+              </Link>
             </div>
           </div>
-          <Link to={'/freight'}><button className={`${counter == 3 ? 'hidden' : ''} mx-auto block my-5 text-gray-600 transition-all duration-200 hover:text-blue-700 cursor-pointer text-sm`}>Hozircha o'tkazib yuborish</button></Link>
+          <Link to={'/freight/asosiy'}><button className={`${counter == 3 ? 'hidden' : ''} mx-auto block my-5 text-gray-600 transition-all duration-200 hover:text-blue-700 cursor-pointer text-sm`}>Hozircha o'tkazib yuborish</button></Link>
         </div>
       </div>
     </div>
