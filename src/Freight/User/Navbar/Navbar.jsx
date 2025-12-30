@@ -5,7 +5,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <nav className='h-20 flex items-center bg-white shadow-md sticky top-0 z-50'>
-      <div className="container mx-auto px-4 sm:px-0 flex items-center justify-between">
+      <div className="container mx-auto px-4 sm:px-5 flex items-center justify-between">
         <div className="flex gap-3 items-center cursor-pointer duration-300 transform hover:scale-105" onClick={() => scrollToSection('home')}>
           <div className="w-10 h-10 rounded-lg flex items-center bg-linear-to-br from-[#4361ee] to-[#7209b7]">
             <FaTruckLoading className='text-xl text-white m-auto' />
@@ -16,9 +16,9 @@ const Navbar = () => {
           <NavLink to='/freight/asosiy' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Asosiy</NavLink>
           <NavLink to='/freight/yuk' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Yuklar</NavLink>
           <NavLink to='/freight/haydovchilar' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Haydovchilar</NavLink>
-          <li className='font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Xarita</li>
+          <NavLink to='/freight/xarita' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Xarita</NavLink>
           <li className='font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Narxlar</li>
-          <li className='font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Yordam</li>
+          <NavLink to='/freight/yordam' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Yordam</NavLink>
           <NavLink to={'/profile-setup'} className='text-2xl bg-linear-to-br from-[#4361ee] to-[#7209b7] text-white py-2 px-2.5 cursor-pointer rounded-full'>AS</NavLink>
         </ul>
         <div className="lg:hidden text-2xl text-[#4361ee] cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
