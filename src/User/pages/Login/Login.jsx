@@ -11,8 +11,8 @@ import {
   FaTruck,
   FaAngleRight,
   FaBox,
-  FaChevronCircleRight,
 } from "react-icons/fa";
+
 import { RiCheckboxCircleFill } from "react-icons/ri";
 const Login = () => {
   const [counter, setCounter] = useState(0)
@@ -137,7 +137,11 @@ const Login = () => {
     }
   }, [language]);
 
+ 
+
   const t = (key) => translations[language]?.[key] || key;
+
+
 
   return (
     <div className='main-bg p-5 min-h-screen'>
@@ -170,7 +174,7 @@ const Login = () => {
             </div>
             <p><FaAngleRight className='text-2xl text-zinc-1/5800' /></p>
           </div>
-          <button onClick={() => setCounter(counter + 1)} disabled={job == ''} className='flex justify-center mx-5 rounded-xl bg-blue-700 transition-all duration-200 hover:-translate-y-1 items-center gap-x-2 py-3 text-white disabled:bg-blue-700/50 disabled:cursor-not-allowed'><FaArrowRight className='inline' />{t("continue")}</button>
+          <button onClick={() => setCounter(counter + 1)} disabled={job == ''} className='flex cursor-pointer justify-center mx-5 rounded-xl bg-blue-700 transition-all duration-200 hover:-translate-y-1 items-center gap-x-2 py-3 text-white disabled:bg-blue-700/50 disabled:cursor-not-allowed'><FaArrowRight className='inline' />{t("continue")}</button>
           <p className='text-center py-4 text-zinc-600'>{t("haveAccount")} <a href="#" className='text-blue-700'>{t("login")}</a></p>
         </div>
       </div>
@@ -180,7 +184,7 @@ const Login = () => {
       <div className={counter == 1 ? "lg:w-2/5 md:w-3/5 sm:w-4/5 m-auto" : "hidden"}>
         <div className="rounded-t-2xl main-bg text-center p-5 text-white">
           <div className="flex justify-evenly items-center py-5">
-            <button onClick={() => setCounter(counter - 1)} className='p-3 rounded-xl bg-white/20 hover:bg-white/40 hover:-translate-x-1 transition-all duration-200'><FaArrowLeft /></button>
+            <button onClick={() => setCounter(counter - 1)} className='p-3 cursor-pointer rounded-xl bg-white/20 hover:bg-white/40 hover:-translate-x-1 transition-all duration-200'><FaArrowLeft /></button>
             <h1 className='text-3xl items-center flex justify-center'><span className='p-2 mx-2 bg-white/20 rounded-2xl'><FaTruckLoading className='inline mx-2' /></span> Yuk.uz</h1>
             <div className='px-5'></div>
           </div>
@@ -226,8 +230,8 @@ const Login = () => {
             </div>
             <div className={language == 'en' ? '' : 'hidden'}><RiCheckboxCircleFill className='inline text-2xl text-blue-700' /></div>
           </div>
-          <div className='flex justify-center mx-5 rounded-xl bg-blue-700 transition-all duration-200 hover:-translate-y-1'>
-            <button onClick={() => setCounter(counter + 1)} className='flex items-center gap-x-2 py-3 text-white'><FaArrowRight className='inline' />{t("continue")}</button>
+          <div className='flex justify-center mx-5 rounded-xl bg-blue-700 cursor-pointer transition-all duration-200 hover:-translate-y-1'>
+            <button onClick={() => setCounter(counter + 1)} className='flex items-center cursor-pointer gap-x-2 py-3 text-white'><FaArrowRight className='inline' />{t("continue")}</button>
           </div>
           <p className='text-center py-4 text-zinc-600 pb-9'>{t("haveAccount")} <a href="#" className='text-blue-700'>{t("login")}</a></p>
         </div>
@@ -239,7 +243,7 @@ const Login = () => {
         <div className='rounded-t-2xl main-bg text-center px-5 py-6 text-white'>
           <span className='text-center bg-white/30 py-2 px-4 rounded-full'><FaUser className='inline my-4 mx-1' />{job == 1 ? `${t("role_1")}` : `${t("role_2")}`}</span>
           <div className="flex justify-evenly items-center py-5">
-            <button onClick={() => setCounter(counter - 1)} className='p-3 rounded-xl bg-white/20 hover:bg-white/40 hover:-translate-x-1 transition-all duration-200'><FaArrowLeft /></button>
+            <button onClick={() => setCounter(counter - 1)} className='p-3 cursor-pointer rounded-xl bg-white/20 hover:bg-white/40 hover:-translate-x-1 transition-all duration-200'><FaArrowLeft /></button>
             <h1 className='text-3xl items-center flex justify-center'><span className='p-2 mx-2 bg-white/20 rounded-2xl'><FaTruckLoading className='inline mx-2' /></span> Yuk.uz</h1>
             <div className='px-5'></div>
           </div>
@@ -277,7 +281,7 @@ const Login = () => {
             <a href='#' className={login ? 'underline text-xs font-medium text-blue-700' : 'hidden'}>{t('forgotPassword')}</a>
             <div className='flex my-2 justify-center rounded-xl bg-blue-700 transition-all duration-200 hover:-translate-y-1'>
               <Link to={'/freight'}>
-                <button type='submit' className='flex items-center gap-x-2 py-4 text-white'><FaArrowRight className='inline' />{login ? `${t('login')}` : `${t('register')}`}</button>
+                <button type='submit' className='flex cursor-pointer items-center gap-x-2 py-4 text-white'><FaArrowRight className='inline' />{login ? `${t('login')}` : `${t('register')}`}</button>
               </Link>
             </div>
             <div className="flex justify-center items-center gap-x-3">
@@ -286,8 +290,8 @@ const Login = () => {
               <div className="bg-zinc-300 h-0.5 w-2/3"></div>
             </div>
             <div className="grid grid-cols-2 gap-x-3">
-              <button className='border p-4 rounded-xl border-zinc-400 flex justify-center text-xl hover:shadow-lg hover:shadow:900/30 transition-all duration-200 hover:-translate-y-1'><FaGoogle className='text-red-600' /></button>
-              <button className='border p-4 rounded-xl border-zinc-400 flex justify-center text-xl hover:shadow-lg hover:shadow:900/30 transition-all duration-200 hover:-translate-y-1'><FaFacebook /></button>
+              <button className='border cursor-pointer p-4 rounded-xl border-zinc-400 flex justify-center text-xl hover:shadow-lg hover:shadow:900/30 transition-all duration-200 hover:-translate-y-1'><FaGoogle className='text-red-600' /></button>
+              <button className='border cursor-pointer p-4 rounded-xl border-zinc-400 flex justify-center text-xl hover:shadow-lg hover:shadow:900/30 transition-all duration-200 hover:-translate-y-1'><FaFacebook /></button>
             </div>
             <p className='text-xs py-2'>{t('agreeText_1')} <span className='text-blue-700 cursor-pointer'>{t('agreeText_2')}</span> {t('and')} <span className='text-blue-700 cursor-pointer'>{t('agreeText_3')}</span></p>
           </div>

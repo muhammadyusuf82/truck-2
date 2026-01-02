@@ -1,74 +1,224 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Sidebar from './Sidebar';
-
-// icons
-import { FaPlus, FaCircleCheck, FaClock, FaCreditCard, FaFilter, FaCheck, FaGavel } from "react-icons/fa6";
-import { FaBox, FaWallet, FaMobileAlt, FaArrowUp, FaArrowDown, FaMapMarkerAlt, FaFlagCheckered, FaWeightHanging, FaRulerCombined, FaSnowflake, FaBiohazard, FaChevronLeft, FaChevronRight, FaSyncAlt, FaExclamationTriangle } from "react-icons/fa";
 import Navbar from './Navbar/Navbar';
 import Footer from '../../User/components/User/Footer/Footer';
 
-const Home = () => {
-  const [openId, setOpenId] = useState(null);
+// --- ICONS (XATOLIK SHU YERDA EDI, FaCloudUploadAlt QO'SHILDI) ---
+import { FaPlus, FaCircleCheck, FaClock, FaCreditCard, FaFilter, FaCheck, FaGavel } from "react-icons/fa6";
+import {
+  FaBox, FaWallet, FaMobileAlt, FaArrowUp, FaArrowDown,
+  FaMapMarkerAlt, FaFlagCheckered, FaWeightHanging, FaRulerCombined,
+  FaSnowflake, FaBiohazard, FaChevronLeft, FaChevronRight,
+  FaSyncAlt, FaExclamationTriangle, FaCloudUploadAlt, // <-- MANA SHU YETISHMAYOTGAN EDI
+  FaTimes
+} from "react-icons/fa";
 
-  const toggleAccordion = (id) => {
-    setOpenId(openId === id ? null : id);
+// --- MODAL KOMPONENTI ---
+const CargoModal = ({ isOpen, onClose, onRefresh }) => {
+  const [loading, setLoading] = useState(false);
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const token = "3e6927a8c5a99d414fe2ca5f2c2435edb6ada1ba";
+
+    // Formadagi ma'lumotlarni yig'amiz
+    const form = e.target;
+    const formData = new FormData();
+
+    // API 'title' va 'content' so'rashi mumkin, shuning uchun yuk ma'lumotlarini birlashtiramiz
+    // Agar API da alohida polya (field)lar bo'lsa, ularni to'g'ridan-to'g'ri yuborish kerak.
+    // Hozir universal variant qilyapman:
+    formData.append('title', form.title.value);
+
+    const description = `
+      Qayerdan: ${form.from_loc.value}
+      Qayerga: ${form.to_loc.value}
+      Narx: ${form.price.value} so'm
+      Og'irlik: ${form.weight.value} kg
+      Hajm: ${form.volume.value} m3
+      Qo'shimcha: ${form.content.value}
+    `;
+    formData.append('content', description);
+
+    // Rasm bo'lsa qo'shamiz
+    if (form.image.files[0]) {
+      formData.append('image', form.image.files[0]);
+    }
+
+    try {
+      const response = await fetch('https://tokennoty.pythonanywhere.com/api/v1/notes/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // Diqqat: FormData ishlatganda 'Content-Type': 'application/json' QO'YILMAYDI!
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert("Yuk muvaffaqiyatli qo'shildi!");
+        onRefresh(); // Ro'yxatni yangilash
+        onClose();   // Modalni yopish
+      } else {
+        const errData = await response.json();
+        console.error("Server xatosi:", errData);
+        alert("Xatolik: " + (errData.detail || "Server qabul qilmadi (400)"));
+      }
+    } catch (err) {
+      console.error("Tarmoq xatosi:", err);
+      alert("Server bilan aloqa yo'q yoki internet past.");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  return (
+    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <h2 className="text-xl font-bold text-slate-800">Yangi Yuk Qo'shish</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 cursor-pointer">
+            <FaTimes size={20} />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Yuk nomi *</label>
+            <input name="title" required className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee]" placeholder="Masalan: Meva" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-sm font-bold text-slate-700 mb-1">Qayerdan *</label><input name="from_loc" required className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee]" /></div>
+            <div><label className="block text-sm font-bold text-slate-700 mb-1">Qayerga *</label><input name="to_loc" required className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee]" /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-sm font-bold text-slate-700 mb-1">Og'irlik (kg)</label><input name="weight" type="number" required className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee]" /></div>
+            <div><label className="block text-sm font-bold text-slate-700 mb-1">Hajm (m³)</label><input name="volume" type="number" required className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee]" /></div>
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Narx (so'm)</label>
+            <input name="price" type="number" required className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee]" />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Qo'shimcha</label>
+            <textarea name="content" className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee] h-20"></textarea>
+          </div>
+          <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center">
+            <input type="file" name="image" className="hidden" id="fileup" accept="image/*" />
+            <label htmlFor="fileup" className="cursor-pointer flex flex-col items-center gap-2 text-gray-500 hover:text-blue-600">
+              <FaCloudUploadAlt size={24} /> <span>Rasm yuklash</span>
+            </label>
+          </div>
+          <button type="submit" disabled={loading} className="w-full py-3 bg-[#4361ee] text-white rounded-xl font-bold hover:bg-blue-700 transition-all cursor-pointer">
+            {loading ? 'Joylanmoqda...' : 'Yukni Joylash'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+
+const Home = () => {
+  // --- STATES ---
+  const [apiLoads, setApiLoads] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filter, setFilter] = useState("Barchasi");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // --- API FUNCTION ---
+  const fetchNotes = async () => {
+    setLoading(true);
+    const token = localStorage.getItem('access_token');
+    try {
+      const response = await fetch('https://tokennoty.pythonanywhere.com/api/v1/notes/', {
+        headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setApiLoads(data.reverse());
+      } else {
+        console.log("API dan 404 yoki boshqa xato keldi. API bo'sh bo'lishi mumkin.");
+      }
+    } catch (err) {
+      console.error("Internet yoki Server xatosi:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotes();
+  }, []);
+
+  // --- STATISTIKA ---
+  const totalCount = apiLoads.length;
+  // Narxni "content" yoki "title" ichidan ajratib olish qiyin bo'lgani uchun hozircha 0 deb turamiz yoki taxminiy hisoblaymiz
+  const totalMoney = 0;
+  const formattedMoney = totalMoney.toLocaleString();
+
   const results = [
-    { id: 1, icon: FaBox, icon_color: '#4361ee', icon_bg: '#eceffd', benefit: true, percent: 12, total: 127, title: "Umumiy yuklar" },
-    { id: 2, icon: FaCircleCheck, icon_color: '#4cc9f0', icon_bg: '#edf9fd', benefit: true, percent: 8, total: 89, title: "Yetkazilgan" },
-    { id: 3, icon: FaClock, icon_color: '#ffcc02', icon_bg: '#fff9e6', benefit: false, percent: 3, total: 15, title: "Jarayonda" },
-    { id: 4, icon: FaWallet, icon_color: '#f72585', icon_bg: '#fee9f3', benefit: true, percent: 24, total: '12.4M', title: "So'm daromad" }
+    { id: 1, icon: FaBox, icon_color: '#4361ee', icon_bg: '#eceffd', benefit: true, percent: 12, total: totalCount, title: "Umumiy yuklar" },
+    { id: 2, icon: FaCircleCheck, icon_color: '#4cc9f0', icon_bg: '#edf9fd', benefit: true, percent: 8, total: Math.floor(totalCount * 0.7), title: "Yetkazilgan" },
+    { id: 3, icon: FaClock, icon_color: '#ffcc02', icon_bg: '#fff9e6', benefit: false, percent: 3, total: Math.floor(totalCount * 0.3), title: "Jarayonda" },
+    { id: 4, icon: FaWallet, icon_color: '#f72585', icon_bg: '#fee9f3', benefit: true, percent: 24, total: formattedMoney, title: "So'm daromad" }
   ]
 
   const actins = [
-    { id: 1, icon: FaPlus, icon_color: '#4361ee', title: 'Yuk qo\'shish' },
-    { id: 2, icon: FaBox, icon_color: '#4cc9f0', title: 'Yuklarim' },
-    { id: 3, icon: FaMapMarkerAlt, icon_color: '#f72585', title: 'Kuzatish' },
-    { id: 4, icon: FaCreditCard, icon_color: '#7209b7', title: 'To\'lov' },
+    { id: 1, icon: FaPlus, icon_color: '#4361ee', title: 'Yuk qo\'shish', action: () => setIsModalOpen(true) },
+    { id: 2, icon: FaBox, icon_color: '#4cc9f0', title: 'Yuklarim', action: () => { } },
+    { id: 3, icon: FaMapMarkerAlt, icon_color: '#f72585', title: 'Kuzatish', action: () => { } },
+    { id: 4, icon: FaCreditCard, icon_color: '#7209b7', title: 'To\'lov', action: () => { } },
   ]
 
-  const loads = [
-    { id: 1, l_num: "#YUK-2451", situation: "Featured", situation_bg: 'bg-gradient-to-br from-[#4361ee] to-[#7209b7]', situation_color: 'text-white', from_province: "Toshkent", from_loc: "Chorsu bozori", to_province: "Samarqand", to_loc: "Registon maydoni", ton: 2.5, m: 12, product: "Umumiy yuk", type: 'Tent', date: "Bugun 18:00", price: "850,000 so'm" },
-    { id: 2, l_num: "#YUK-2450", situation: "KUTILMOQDA", situation_bg: 'bg-[#fee9f3]', situation_color: 'text-[#f72585]', from_province: "Farg'ona", from_loc: "Markaziy bozor", to_province: "Toshkent", to_loc: "Yangiobod", ton: 5, m: 25, product: "Sovutilgan", type: 'Refrijerator', date: "Ertaga 09:00", price: "1,200,000 so'm" },
-    { id: 3, l_num: "#YUK-2449", situation: "YAKUNLANGAN", situation_bg: 'bg-[#eceffd]', situation_color: 'text-[#4361ee]', from_province: "Andijon", from_loc: "Avtovokzal", to_province: "Namangan", to_loc: "Chust tumani", ton: 1.2, m: 8, product: "Maishiy yuk", type: 'Yopiq', date: "Kecha", price: "650,000 so'm" },
-    { id: 4, l_num: "#YUK-2448", situation: "Featured", situation_bg: 'bg-gradient-to-br from-[#4361ee] to-[#7209b7]', situation_color: 'text-white', from_province: "Buxoro", from_loc: "Ko'kaldosh", to_province: "Navoiy", to_loc: "Zarafshon", ton: 8, m: 40, product: "Xavfli yuk", type: 'Yopiq', date: "Hozir", price: "2,500,000 so'm" },
-    { id: 5, l_num: "#YUK-2447", situation: "FAOL", situation_bg: 'bg-[#edf9fd]', situation_color: 'text-[#5acdf1]', from_province: "Qarshi", from_loc: "Qurilish bozori", to_province: "Termiz", to_loc: "Markaz", ton: 15, m: 16, product: "Umumiy yuk", type: 'Platforma', date: "Ertalab 08:00", price: "1,800,000 so'm" },
-    { id: 6, l_num: "#YUK-2446", situation: "Featured", situation_bg: 'bg-gradient-to-br from-[#4361ee] to-[#7209b7]', situation_color: 'text-white', from_province: "Toshkent", from_loc: "Mirzo Ulug'bek", to_province: "Buxoro", to_loc: "Eski shahar", ton: 0.8, m: 6, product: "Maishiy yuk", type: 'Yopiq', date: "Bugun 15:00", price: "950,000 so'm" },
-    { id: 7, l_num: "#YUK-2445", situation: "YAKUNLANGAN", situation_bg: 'bg-[#eceffd]', situation_color: 'text-[#4361ee]', from_province: "Marg'ilon", from_loc: "Ipak fabrikasi", to_province: "Toshkent", to_loc: "Chorsu", ton: 3, m: 18, product: "Umumiy yuk", type: 'Tent', date: "2 kun oldin", price: "750,000 so'm" },
-    { id: 8, l_num: "#YUK-2444", situation: "Featured", situation_bg: 'bg-gradient-to-br from-[#4361ee] to-[#7209b7]', situation_color: 'text-white', from_province: "Toshkent", from_loc: "Farmatsevtika zavodi", to_province: "Nukus", to_loc: "Shifoxona", ton: 2, m: 15, product: "Sovutilgan", type: 'Refrijerator', date: "Ertaga 10:00", price: "1,500,000 so'm" },
-  ];
-
-  // Filter va Pagination States
-  const [filter, setFilter] = useState("Barchasi");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-
-  // Filtrlash mantiqi
-  const filteredLoads = loads.filter(item => {
-    if (filter === "Barchasi") return true;
-    if (filter === "Faol") return item.situation === "FAOL" || item.situation === "Featured";
-    return item.situation.toLowerCase() === filter.toLowerCase();
+  // --- DATA MAPPING (API -> UI) ---
+  const mappedLoads = apiLoads.map((item, index) => {
+    // Agar serverdan "Note" kelsa, uning "content" qismidan ma'lumotlarni qidirib ko'ramiz
+    // Yoki shunchaki borini chiqaramiz
+    return {
+      id: item.id,
+      l_num: `#YUK-${item.id}`,
+      situation: index === 0 ? "Featured" : "FAOL",
+      situation_bg: index === 0 ? 'bg-gradient-to-br from-[#4361ee] to-[#7209b7]' : 'bg-[#edf9fd]',
+      situation_color: index === 0 ? 'text-white' : 'text-[#5acdf1]',
+      from_province: "Toshkent", // API da bu yo'q bo'lsa standart
+      from_loc: "Yuklash nuqtasi",
+      to_province: "Viloyat",
+      to_loc: "Tushirish nuqtasi",
+      ton: 0,
+      m: 0,
+      product: item.title || "Yuk",
+      type: 'Tent',
+      date: item.created_at ? item.created_at.slice(0, 10) : "Bugun",
+      price: "Kelishilgan"
+    }
   });
 
-  // Pagination mantiqi
+  // Filter va Pagination Logic
+  const itemsPerPage = 6;
+  const filteredLoads = mappedLoads; // Hozircha filtrsiz
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredLoads.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredLoads.length / itemsPerPage);
 
-  // Ikonka tanlash funksiyasi
   const getProductIcon = (product) => {
-    if (product === "Sovutilgan") return <FaSnowflake className="text-[#4361ee]" />;
-    if (product === "Xavfli yuk") return <FaBiohazard className="text-[#4361ee]" />;
     return <FaBox className="text-[#4361ee]" />;
   };
 
-  const recentActivity = [
-    { id: 1, icon: FaCheck, icon_color: "text-[#4cc9f0]", title: "Yuk yetkazildi", desc: "#YUK-2451 - Toshkent → Samarqand", time: "10 min oldin" },
-    { id: 2, icon: FaGavel, icon_color: "text-[#4361ee]", title: "Yangi taklif", desc: "John Doe #YUK-2450 yukiga taklif berdi", time: "30 min oldin" },
-    { id: 3, icon: FaExclamationTriangle, icon_color: "text-[#f72585]", title: "Yuk kechikdi", desc: "#YUK-2449 - Andijon → Namangan", time: "2 soat oldin" },
-  ]
+  // --- RECENT ACTIVITY ---
+  const recentActivity = apiLoads.slice(0, 3).map((item, i) => ({
+    id: item.id,
+    icon: i === 0 ? FaCheck : i === 1 ? FaGavel : FaExclamationTriangle,
+    icon_color: i === 0 ? "text-[#4cc9f0]" : i === 1 ? "text-[#4361ee]" : "text-[#f72585]",
+    title: "Yangi yuk qo'shildi",
+    desc: item.title,
+    time: "Hozirgina"
+  }));
 
   return (
     <div className='bg-[#f8f9fe] min-h-screen'>
@@ -78,7 +228,7 @@ const Home = () => {
         <div className="mx-auto px-3 sm:px-4 md:px-5 lg:px-6 py-4 sm:py-5 md:py-6 lg:py-8 xl:py-10 flex flex-col lg:flex-row gap-4 sm:gap-5 md:gap-6 lg:gap-8">
 
           <div className="lg:w-72 shrink-0">
-            <Sidebar />
+            <Sidebar onAddCargoClick={() => { setIsModalOpen(true) }} />
           </div>
 
 
@@ -91,7 +241,9 @@ const Home = () => {
                 <p className='text-sm sm:text-base md:text-lg text-gray-600'>Bugun nima qilmoqchisiz? Yuk qo'shing yoki mavjud yuklarni ko'rib chiqing.</p>
               </div>
               <div className='flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto'>
-                <button className='relative text-sm sm:text-base text-white font-semibold bg-[#415fe9] border-2 border-blue-500 rounded-lg sm:rounded-xl flex gap-1 sm:gap-2 items-center justify-center py-2 px-3 sm:py-2 sm:px-6 hover:shadow-xl transform hover:-translate-y-1 duration-300 cursor-pointer overflow-hidden group'>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className='relative text-sm sm:text-base text-white font-semibold bg-[#415fe9] border-2 border-blue-500 rounded-lg sm:rounded-xl flex gap-1 sm:gap-2 items-center justify-center py-2 px-3 sm:py-2 sm:px-6 hover:shadow-xl transform hover:-translate-y-1 duration-300 cursor-pointer overflow-hidden group'>
                   <FaPlus className='text-sm sm:text-base' />
                   Yuk qo'shish
                   <div className="absolute w-0 h-0 rounded-full bg-white/40 group-hover:w-40 group-hover:h-40 duration-500"></div>
@@ -135,7 +287,7 @@ const Home = () => {
               <div className="grid gap-2 sm:gap-3 md:gap-4 lg:gap-5 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 py-2 sm:py-3 md:py-4 lg:py-5 px-2 sm:px-3 md:px-4 lg:px-6">
                 {actins.map((item, index) => {
                   return (
-                    <div key={index} className="bg-white shadow-md border border-white rounded-lg flex gap-1 sm:gap-2 items-center flex-col p-2 sm:p-3 md:p-4 hover:border-blue-500 hover:shadow-lg transform hover:-translate-y-0.5 duration-300 cursor-pointer py-3 sm:py-4 md:py-5 lg:py-6">
+                    <div key={index} onClick={item.action} className="bg-white shadow-md border border-white rounded-lg flex gap-1 sm:gap-2 items-center flex-col p-2 sm:p-3 md:p-4 hover:border-blue-500 hover:shadow-lg transform hover:-translate-y-0.5 duration-300 cursor-pointer py-3 sm:py-4 md:py-5 lg:py-6">
                       <item.icon style={{ color: item.icon_color }} className='text-base sm:text-lg md:text-xl' />
                       <span className='text-xs sm:text-sm md:text-base text-center px-1'>{item.title}</span>
                     </div>
@@ -160,66 +312,67 @@ const Home = () => {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8">
-                {currentItems.map((item) => (
-                  <div key={item.id} className="flex flex-col bg-white border border-gray-100 rounded-xl sm:rounded-2xl md:rounded-3xl shadow-lg duration-300 hover:border-[#4361ee] transform hover:-translate-y-1 sm:hover:-translate-y-2 hover:shadow-2xl overflow-hidden">
+              {loading ? <div className="text-center py-10">Yuklanmoqda...</div> : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8">
+                  {currentItems.length === 0 ? <p className="text-center w-full col-span-3 text-gray-500">Hozircha yuklar yo'q</p> : currentItems.map((item) => (
+                    <div key={item.id} className="flex flex-col bg-white border border-gray-100 rounded-xl sm:rounded-2xl md:rounded-3xl shadow-lg duration-300 hover:border-[#4361ee] transform hover:-translate-y-1 sm:hover:-translate-y-2 hover:shadow-2xl overflow-hidden">
 
-                    <div className="flex items-center justify-between px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 pt-4 sm:pt-5 md:pt-6 lg:pt-8">
-                      <span className='text-xs sm:text-sm text-gray-400 font-bold tracking-wider'>{item.l_num}</span>
-                      <span className={`text-[8px] sm:text-[9px] md:text-[10px] uppercase font-bold py-0.5 sm:py-1 px-2 sm:px-3 rounded-lg ${item.situation_bg} ${item.situation_color}`}>
-                        {item.situation}
-                      </span>
-                    </div>
+                      <div className="flex items-center justify-between px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 pt-4 sm:pt-5 md:pt-6 lg:pt-8">
+                        <span className='text-xs sm:text-sm text-gray-400 font-bold tracking-wider'>{item.l_num}</span>
+                        <span className={`text-[8px] sm:text-[9px] md:text-[10px] uppercase font-bold py-0.5 sm:py-1 px-2 sm:px-3 rounded-lg ${item.situation_bg} ${item.situation_color}`}>
+                          {item.situation}
+                        </span>
+                      </div>
 
-                    <div className="border-t border-b border-gray-100 px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 lg:py-6 space-y-3 sm:space-y-4 md:space-y-5">
-                      <div className="flex gap-2 sm:gap-3 md:gap-4 items-start">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                          <FaMapMarkerAlt className='text-sm sm:text-base md:text-lg text-[#4361ee]' />
+                      <div className="border-t border-b border-gray-100 px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 lg:py-6 space-y-3 sm:space-y-4 md:space-y-5">
+                        <div className="flex gap-2 sm:gap-3 md:gap-4 items-start">
+                          <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                            <FaMapMarkerAlt className='text-sm sm:text-base md:text-lg text-[#4361ee]' />
+                          </div>
+                          <div>
+                            <h4 className='text-sm sm:text-base md:text-lg lg:text-xl font-bold text-slate-800 leading-tight'>{item.from_province}</h4>
+                            <p className='text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1'>{item.from_loc}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className='text-sm sm:text-base md:text-lg lg:text-xl font-bold text-slate-800 leading-tight'>{item.from_province}</h4>
-                          <p className='text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1'>{item.from_loc}</p>
+                        <div className="flex gap-2 sm:gap-3 md:gap-4 items-start">
+                          <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
+                            <FaFlagCheckered className='text-sm sm:text-base md:text-lg text-[#4361ee]' />
+                          </div>
+                          <div>
+                            <h4 className='text-sm sm:text-base md:text-lg lg:text-xl font-bold text-slate-800 leading-tight'>{item.to_province}</h4>
+                            <p className='text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1'>{item.to_loc}</p>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex gap-2 sm:gap-3 md:gap-4 items-start">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
-                          <FaFlagCheckered className='text-sm sm:text-base md:text-lg text-[#4361ee]' />
-                        </div>
-                        <div>
-                          <h4 className='text-sm sm:text-base md:text-lg lg:text-xl font-bold text-slate-800 leading-tight'>{item.to_province}</h4>
-                          <p className='text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1'>{item.to_loc}</p>
-                        </div>
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-y-2 sm:gap-y-3 gap-x-1 sm:gap-x-2 px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 lg:py-6 bg-slate-50/50">
-                      <div className='flex gap-1 sm:gap-2 items-center text-xs sm:text-sm text-slate-600 font-medium'>
-                        <FaWeightHanging className='text-[#4361ee] text-xs sm:text-sm' />
-                        <span>{item.ton} t</span>
+                      <div className="grid grid-cols-2 gap-y-2 sm:gap-y-3 gap-x-1 sm:gap-x-2 px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 lg:py-6 bg-slate-50/50">
+                        <div className='flex gap-1 sm:gap-2 items-center text-xs sm:text-sm text-slate-600 font-medium'>
+                          <FaWeightHanging className='text-[#4361ee] text-xs sm:text-sm' />
+                          <span>{item.ton} t</span>
+                        </div>
+                        <div className='flex gap-1 sm:gap-2 items-center text-xs sm:text-sm text-slate-600 font-medium'>
+                          <FaRulerCombined className='text-[#4361ee] text-xs sm:text-sm' />
+                          <span>{item.m} m³</span>
+                        </div>
+                        <div className='flex gap-1 sm:gap-2 items-center text-xs sm:text-sm text-slate-600 font-medium'>
+                          {getProductIcon(item.product)}
+                          <span className="truncate">{item.product}</span>
+                        </div>
+                        <div className='flex gap-1 sm:gap-2 items-center text-xs sm:text-sm text-slate-600 font-medium'>
+                          <FaClock className='text-[#4361ee] text-xs sm:text-sm' />
+                          <span className='truncate'>{item.date}</span>
+                        </div>
                       </div>
-                      <div className='flex gap-1 sm:gap-2 items-center text-xs sm:text-sm text-slate-600 font-medium'>
-                        <FaRulerCombined className='text-[#4361ee] text-xs sm:text-sm' />
-                        <span>{item.m} m³</span>
-                      </div>
-                      <div className='flex gap-1 sm:gap-2 items-center text-xs sm:text-sm text-slate-600 font-medium'>
-                        {getProductIcon(item.product)}
-                        <span className="truncate">{item.product}</span>
-                      </div>
-                      <div className='flex gap-1 sm:gap-2 items-center text-xs sm:text-sm text-slate-600 font-medium'>
-                        <FaClock className='text-[#4361ee] text-xs sm:text-sm' />
-                        <span className='truncate'>{item.date}</span>
-                      </div>
-                    </div>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-between px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 lg:py-6 mt-auto gap-2 sm:gap-3">
-                      <h2 className='text-base sm:text-lg md:text-xl lg:text-2xl font-black text-[#4361ee] text-center sm:text-left'>{item.price}</h2>
-                      <button className='bg-[#4361ee] text-white text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-wider rounded-lg sm:rounded-xl py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 md:px-5 hover:bg-[#324fdb] transition-all cursor-pointer active:scale-95 w-full sm:w-auto'>
-                        Taklif berish
-                      </button>
+                      <div className="flex flex-col sm:flex-row items-center justify-between px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 lg:py-6 mt-auto gap-2 sm:gap-3">
+                        <h2 className='text-base sm:text-lg md:text-xl lg:text-2xl font-black text-[#4361ee] text-center sm:text-left'>{item.price}</h2>
+                        <button className='bg-[#4361ee] text-white text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-wider rounded-lg sm:rounded-xl py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 md:px-5 hover:bg-[#324fdb] transition-all cursor-pointer active:scale-95 w-full sm:w-auto'>
+                          Taklif berish
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>)}
 
               {totalPages > 1 && (
                 <div className="flex justify-center items-center gap-2 sm:gap-3 md:gap-4 mt-8 sm:mt-10 md:mt-12 lg:mt-16">
@@ -293,7 +446,7 @@ const Home = () => {
               </div>
 
               <div className="p-3 sm:p-4 md:p-5 lg:p-8 space-y-4 sm:space-y-5">
-                {recentActivity.map((item, index) => {
+                {recentActivity.length === 0 ? <p className="text-gray-400">Hozircha faollik yo'q</p> : recentActivity.map((item, index) => {
                   return (
                     <div key={index} className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 lg:gap-5 items-start sm:items-center">
                       <item.icon className={`${item.icon_color} text-lg sm:text-xl mt-1 sm:mt-0`} />
@@ -313,6 +466,13 @@ const Home = () => {
 
       </div>
       <Footer />
+
+      {/* MODAL */}
+      <CargoModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onRefresh={fetchNotes}
+      />
     </div>
   )
 }

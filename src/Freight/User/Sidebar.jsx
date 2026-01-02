@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { FaStar, FaTachometerAlt, FaBox, FaTruck, FaWallet, FaChartLine, FaCog, FaSignOutAlt, FaBars, FaTimes } from "react-icons/fa";
 import { FaStarHalfStroke, FaCirclePlus, FaCircleQuestion } from "react-icons/fa6";
 
-const Sidebar = () => {
+const Sidebar = ({ onAddCargoClick }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeId, setActiveId] = useState(1);
 
     const pages = [
         { id: 1, icon: FaTachometerAlt, title: "Dashboard" },
-        { id: 2, icon: FaCirclePlus, title: "Yuk qo'shish" },
+        { id: 2, icon: FaCirclePlus, title: "Yuk qo'shish", action: onAddCargoClick },
         { id: 3, icon: FaBox, title: "Mening yuklarim" },
         { id: 4, icon: FaTruck, title: "Haydovchilar" },
         { id: 5, icon: FaWallet, title: "To'lovlar" },
@@ -20,7 +20,6 @@ const Sidebar = () => {
 
     return (
         <>
-            {/* Mobil uchun ochish tugmasi */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="lg:hidden fixed bottom-6 right-6 z-50 bg-[#4361ee] text-white p-4 rounded-full shadow-2xl"
@@ -28,13 +27,12 @@ const Sidebar = () => {
                 {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
 
-            {/* Sidebar Asosiy qismi */}
             <div className={`
         fixed top-20 lg:sticky lg:top-25 inset-y-0 left-0 z-40 w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:shadow-lg lg:rounded-3xl
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
                 <div className="sticky flex flex-col h-full py-8 px-5 overflow-y-auto">
-                    {/* Profil qismi */}
+
                     <div className="flex flex-col items-center mb-6">
                         <div className="w-20 h-20 rounded-full border-4 border-white shadow-lg bg-linear-to-br from-[#4361ee] to-[#7209b7] flex items-center justify-center text-white text-3xl font-bold">
                             AS
@@ -51,13 +49,12 @@ const Sidebar = () => {
                         </div>
                     </div>
 
-                    {/* Menyu */}
                     <nav className="flex-1">
                         <ul className="space-y-2">
                             {pages.map((item) => (
                                 <li
                                     key={item.id}
-                                    onClick={() => { setActiveId(item.id); setIsOpen(false); }}
+                                    onClick={() => { setActiveId(item.id); setIsOpen(false); if (item.action) item.action(); }}
                                     className={`flex items-center gap-4 p-3 px-5 rounded-xl cursor-pointer transition-all duration-200
                     ${activeId === item.id
                                             ? "bg-linear-to-r from-[#4361ee] to-[#7209b7] text-white shadow-md font-semibold"
@@ -71,7 +68,6 @@ const Sidebar = () => {
                         </ul>
                     </nav>
 
-                    {/* Progress qismi */}
                     <div className="mt-8 p-4 bg-slate-50 rounded-2xl">
                         <h4 className="text-sm font-bold text-slate-800">Premium a'zolik</h4>
                         <p className="text-xs text-slate-500 mt-1">Sizda 15 kun qoldi</p>
@@ -82,7 +78,6 @@ const Sidebar = () => {
                 </div>
             </div>
 
-            {/* Mobil uchun orqa fon (overlay) */}
             {isOpen && (
                 <div
                     onClick={() => setIsOpen(false)}

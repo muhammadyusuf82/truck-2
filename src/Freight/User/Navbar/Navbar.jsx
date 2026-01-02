@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaTruckLoading, FaBars, FaTimes } from "react-icons/fa";
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -10,14 +10,16 @@ const Navbar = () => {
           <div className="w-10 h-10 rounded-lg flex items-center bg-linear-to-br from-[#4361ee] to-[#7209b7]">
             <FaTruckLoading className='text-xl text-white m-auto' />
           </div>
+          <Link to={'/'}>
           <h2 className='text-2xl text-[#4361ee] font-bold'>Yuk.uz</h2>
+          </Link>
         </div>
         <ul className='hidden lg:flex list-none gap-6 items-center'>
           <NavLink to='/freight/asosiy' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Asosiy</NavLink>
           <NavLink to='/freight/yuk' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Yuklar</NavLink>
           <NavLink to='/freight/haydovchilar' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Haydovchilar</NavLink>
           <NavLink to='/freight/xarita' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Xarita</NavLink>
-          <li className='font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Narxlar</li>
+          <NavLink to='/freight/narxlar' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Narxlar</NavLink>
           <NavLink to='/freight/yordam' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Yordam</NavLink>
           <NavLink to={'/profile-setup'} className='text-2xl bg-linear-to-br from-[#4361ee] to-[#7209b7] text-white py-2 px-2.5 cursor-pointer rounded-full'>AS</NavLink>
         </ul>
