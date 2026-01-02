@@ -3,34 +3,59 @@ import Sidebar from './Sidebar';
 import Navbar from './Navbar/Navbar';
 import Footer from '../../User/components/User/Footer/Footer';
 
-// --- ICONS (XATOLIK SHU YERDA EDI, FaCloudUploadAlt QO'SHILDI) ---
 import { FaPlus, FaCircleCheck, FaClock, FaCreditCard, FaFilter, FaCheck, FaGavel } from "react-icons/fa6";
 import {
   FaBox, FaWallet, FaMobileAlt, FaArrowUp, FaArrowDown,
   FaMapMarkerAlt, FaFlagCheckered, FaWeightHanging, FaRulerCombined,
   FaSnowflake, FaBiohazard, FaChevronLeft, FaChevronRight,
-  FaSyncAlt, FaExclamationTriangle, FaCloudUploadAlt, // <-- MANA SHU YETISHMAYOTGAN EDI
+  FaSyncAlt, FaExclamationTriangle, FaCloudUploadAlt,
   FaTimes
 } from "react-icons/fa";
 
-// --- MODAL KOMPONENTI ---
+// Token olish funksiyasi
+const getAuthToken = async () => {
+  try {
+    const response = await fetch('https://tokennoty.pythonanywhere.com/api/token/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        password: "123",
+        phone_number: "+998993967336"
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Token API javobi:', data); // Debug uchun
+      // Token qaytarilgan formatga qarab, token ni olish
+      const token = data.token || data.access_token || data.access || data.accessToken || data.access_token || (data.data && data.data.token) || (data.data && data.data.access_token);
+      if (token) {
+        localStorage.setItem('access_token', token);
+        console.log('Token saqlandi:', token.substring(0, 20) + '...'); // Debug uchun
+        return token;
+      } else {
+        console.error('Token topilmadi. API javobi:', data);
+      }
+    } else {
+      const errorText = await response.text();
+      console.error('Token olishda xatolik:', response.status, response.statusText, errorText);
+    }
+  } catch (error) {
+    console.error('Token olishda tarmoq xatosi:', error);
+  }
+  return null;
+};
+
 const CargoModal = ({ isOpen, onClose, onRefresh }) => {
   const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const token = "3e6927a8c5a99d414fe2ca5f2c2435edb6ada1ba";
-
-    // Formadagi ma'lumotlarni yig'amiz
-    const form = e.target;
+  // FormData yaratish funksiyasi
+  const createFormData = (form) => {
     const formData = new FormData();
-
-    // API 'title' va 'content' so'rashi mumkin, shuning uchun yuk ma'lumotlarini birlashtiramiz
-    // Agar API da alohida polya (field)lar bo'lsa, ularni to'g'ridan-to'g'ri yuborish kerak.
-    // Hozir universal variant qilyapman:
     formData.append('title', form.title.value);
 
     const description = `
@@ -43,29 +68,95 @@ const CargoModal = ({ isOpen, onClose, onRefresh }) => {
     `;
     formData.append('content', description);
 
-    // Rasm bo'lsa qo'shamiz
     if (form.image.files[0]) {
       formData.append('image', form.image.files[0]);
     }
+    return formData;
+  };
+
+  // API so'rov yuborish funksiyasi
+  // const sendRequest = async (token, formData) => {
+  //   return await fetch('https://tokennoty.pythonanywhere.com/api/v1/notes/', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Authorization': `Bearer ${token}`
+  //     },
+  //     body: formData,
+  //   });
+  // };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    // Avval tokenni tekshirish va olish
+    let token = localStorage.getItem('access_token');
+    console.log('Mavjud token:', token ? token.substring(0, 20) + '...' : 'yo\'q'); // Debug uchun
+    
+    if (!token) {
+      console.log('Token yo\'q, yangi token olinmoqda...');
+      token = await getAuthToken();
+    }
+    
+    if (!token) {
+      alert("Token olishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.");
+      setLoading(false);
+      return;
+    }
+    
+    console.log('Ishlatilayotgan token:', token.substring(0, 20) + '...'); // Debug uchun
+
+    const form = e.target;
+    const formData = createFormData(form);
 
     try {
-      const response = await fetch('https://tokennoty.pythonanywhere.com/api/v1/notes/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // Diqqat: FormData ishlatganda 'Content-Type': 'application/json' QO'YILMAYDI!
-        },
-        body: formData,
-      });
+      const response = await sendRequest(token, formData);
 
       if (response.ok) {
         alert("Yuk muvaffaqiyatli qo'shildi!");
         onRefresh(); // Ro'yxatni yangilash
         onClose();   // Modalni yopish
+        form.reset(); // Formani tozalash
+      } else if (response.status === 401) {
+        // 401 xatosi bo'lsa, yangi token olish va qayta urinish
+        console.log('401 xatosi, yangi token olinmoqda...');
+        localStorage.removeItem('access_token'); // Eski tokenni o'chirish
+        const newToken = await getAuthToken();
+        if (newToken) {
+          // FormData ni qayta yaratish (chunki bir marta o'qilgandan keyin bo'sh bo'lib qoladi)
+          const retryFormData = createFormData(form);
+          // Yangi token bilan qayta urinish
+          const retryResponse = await sendRequest(newToken, retryFormData);
+          
+          if (retryResponse.ok) {
+            alert("Yuk muvaffaqiyatli qo'shildi!");
+            onRefresh();
+            onClose();
+            form.reset();
+          } else {
+            const errData = await retryResponse.json().catch(() => ({}));
+            alert("Xatolik: " + (errData.detail || errData.message || `${retryResponse.status} ${retryResponse.statusText}`));
+          }
+        } else {
+          alert("Token olishda xatolik. Iltimos, qayta urinib ko'ring.");
+        }
       } else {
-        const errData = await response.json();
-        console.error("Server xatosi:", errData);
-        alert("Xatolik: " + (errData.detail || "Server qabul qilmadi (400)"));
+        // 404 yoki boshqa xatolik bo'lganda JSON parse qilishga urinmaslik
+        let errorMessage = `Xatolik: ${response.status} ${response.statusText}`;
+        try {
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const errData = await response.json();
+            errorMessage = "Xatolik: " + (errData.detail || errData.message || `${response.status} ${response.statusText}`);
+          } else {
+            const text = await response.text();
+            console.error("Server javobi (JSON emas):", text);
+          }
+        } catch (parseErr) {
+          console.error("Xatolikni parse qilishda muammo:", parseErr);
+        }
+        console.error("Server xatosi:", errorMessage);
+        alert(errorMessage);
       }
     } catch (err) {
       console.error("Tarmoq xatosi:", err);
@@ -129,34 +220,39 @@ const Home = () => {
   const [filter, setFilter] = useState("Barchasi");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // --- API FUNCTION ---
-  const fetchNotes = async () => {
-    setLoading(true);
-    const token = localStorage.getItem('access_token');
-    try {
-      const response = await fetch('https://tokennoty.pythonanywhere.com/api/v1/notes/', {
-        headers: { 'Authorization': token ? `Bearer ${token}` : '' }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setApiLoads(data.reverse());
-      } else {
-        console.log("API dan 404 yoki boshqa xato keldi. API bo'sh bo'lishi mumkin.");
-      }
-    } catch (err) {
-      console.error("Internet yoki Server xatosi:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchNotes = async () => {
+  //   setLoading(true);
+  //   const token = localStorage.getItem('access_token');
+  //   try {
+  //     const response = await fetch('https://tokennoty.pythonanywhere.com/api/v1/notes/', {
+  //       headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+  //     });
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       setApiLoads(data.reverse());
+  //     } else {
+  //       console.log("API dan 404 yoki boshqa xato keldi. API bo'sh bo'lishi mumkin.");
+  //     }
+  //   } catch (err) {
+  //     console.error("Internet yoki Server xatosi:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
+  // Component mount bo'lganda token olish
   useEffect(() => {
-    fetchNotes();
+    const initializeToken = async () => {
+      const existingToken = localStorage.getItem('access_token');
+      if (!existingToken) {
+        await getAuthToken();
+      }
+    };
+    initializeToken();
+    // fetchNotes();
   }, []);
 
-  // --- STATISTIKA ---
   const totalCount = apiLoads.length;
-  // Narxni "content" yoki "title" ichidan ajratib olish qiyin bo'lgani uchun hozircha 0 deb turamiz yoki taxminiy hisoblaymiz
   const totalMoney = 0;
   const formattedMoney = totalMoney.toLocaleString();
 
@@ -174,10 +270,7 @@ const Home = () => {
     { id: 4, icon: FaCreditCard, icon_color: '#7209b7', title: 'To\'lov', action: () => { } },
   ]
 
-  // --- DATA MAPPING (API -> UI) ---
   const mappedLoads = apiLoads.map((item, index) => {
-    // Agar serverdan "Note" kelsa, uning "content" qismidan ma'lumotlarni qidirib ko'ramiz
-    // Yoki shunchaki borini chiqaramiz
     return {
       id: item.id,
       l_num: `#YUK-${item.id}`,
@@ -197,7 +290,6 @@ const Home = () => {
     }
   });
 
-  // Filter va Pagination Logic
   const itemsPerPage = 6;
   const filteredLoads = mappedLoads; // Hozircha filtrsiz
 
@@ -210,7 +302,6 @@ const Home = () => {
     return <FaBox className="text-[#4361ee]" />;
   };
 
-  // --- RECENT ACTIVITY ---
   const recentActivity = apiLoads.slice(0, 3).map((item, i) => ({
     id: item.id,
     icon: i === 0 ? FaCheck : i === 1 ? FaGavel : FaExclamationTriangle,
@@ -234,7 +325,6 @@ const Home = () => {
 
           <div className="w-full flex gap-3 sm:gap-4 md:gap-5 flex-col">
 
-            {/* Welcome Section */}
             <div className="w-full bg-white shadow-lg border border-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 items-center justify-between hover:border-blue-500 hover:shadow-xl transform hover:-translate-y-1 sm:hover:-translate-y-2 duration-300">
               <div className='w-full sm:w-3/6 text-center sm:text-left'>
                 <h2 className='text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2'>Xush kelibsiz, Ali!</h2>
@@ -256,7 +346,6 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Results Cards */}
             <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 py-3 sm:py-4 md:py-5 lg:py-6">
               {results.map((item, index) => {
                 return (
@@ -279,7 +368,6 @@ const Home = () => {
               })}
             </div>
 
-            {/* Quick Actions */}
             <div className="w-full bg-white shadow-lg border border-white rounded-2xl sm:rounded-3xl hover:border-blue-500 hover:shadow-xl transform hover:-translate-y-1 sm:hover:-translate-y-2 duration-300">
               <h1 className="text-lg sm:text-xl md:text-2xl font-bold border-b border-gray-300 p-4 sm:p-5 md:p-6 lg:p-8">
                 Tezkor Amallar
@@ -296,7 +384,6 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Active Loads */}
             <div className="w-full bg-white shadow-lg border border-white rounded-2xl sm:rounded-3xl hover:border-blue-500 hover:shadow-xl transform hover:-translate-y-1 sm:hover:-translate-y-2 duration-300 my-5 sm:my-6 md:my-8 lg:my-10 py-5 sm:py-6 md:py-8 lg:py-10 px-3 sm:px-4 md:px-5 lg:px-8">
               <h1 className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-3 sm:mb-4 md:mb-5'>Faol yuklar</h1>
               <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4 mb-5 sm:mb-6 md:mb-8 lg:mb-10 justify-center">
@@ -406,7 +493,6 @@ const Home = () => {
               )}
             </div>
 
-            {/* Real-time Map */}
             <div className="w-full bg-white shadow-lg border border-white rounded-2xl sm:rounded-3xl hover:border-blue-500 hover:shadow-xl transform hover:-translate-y-1 sm:hover:-translate-y-2 duration-300">
               <div className="flex flex-col sm:flex-row items-center justify-between border-b border-gray-300 p-4 sm:p-5 md:p-6 lg:p-8 gap-3 sm:gap-0">
                 <h3 className='text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-center sm:text-left'>Real vaqtda xarita</h3>
@@ -439,7 +525,6 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Recent Activity */}
             <div className="w-full bg-white shadow-lg border border-white rounded-2xl sm:rounded-3xl hover:border-blue-500 hover:shadow-xl transform hover:-translate-y-1 sm:hover:-translate-y-2 duration-300">
               <div className="border-b border-gray-300 p-4 sm:p-5 md:p-6 lg:p-8">
                 <h3 className='text-base sm:text-lg md:text-xl lg:text-2xl font-bold'>So'nggi Faoliyat</h3>
@@ -467,11 +552,10 @@ const Home = () => {
       </div>
       <Footer />
 
-      {/* MODAL */}
       <CargoModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onRefresh={fetchNotes}
+        // onRefresh={fetchNotes}
       />
     </div>
   )

@@ -24,10 +24,15 @@ import {
   FaChevronRight,
   FaMapMarkedAlt,
   FaUser,
-  FaIdCard,
-  FaCar,
-  FaLocationArrow,
-  FaCalendarAlt
+  FaWeight,
+  FaRulerCombined,
+  FaDollarSign,
+  FaCube,
+  FaTruck,
+  FaBoxOpen,
+  FaGlobe,
+  FaRulerHorizontal,
+  FaRulerVertical
 } from 'react-icons/fa';
 
 // Simple Star Rating Component
@@ -141,7 +146,8 @@ function DriverCard({ driver }) {
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Telefon</div>
-            <div className="font-semibold text-gray-900 font-mono">phone_number</div>
+            <div className="font-semibold text-gray-900 font-mono">+998992221133</div>
+            {/* {console.log(driver)} */}
           </div>
           <div>
             <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Transport</div>
@@ -212,18 +218,25 @@ function Haydovchilar() {
   const [showAddDriverModal, setShowAddDriverModal] = useState(false);
   const [transportData, setTransportData] = useState([]);
 
-  // Form states for adding new driver
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [driverId, setDriverId] = useState('');
-  const [vehicleCategory, setVehicleCategory] = useState('truck');
-  const [location, setLocation] = useState('');
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState('online');
-  const [licenseNumber, setLicenseNumber] = useState('');
-  const [registrationDate, setRegistrationDate] = useState('');
-  const [notes, setNotes] = useState('');
+  // Form states for adding new transport/driver according to API structure
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [ownerFirstName, setOwnerFirstName] = useState('');
+  const [ownerLastName, setOwnerLastName] = useState('');
+  const [ownerUsername, setOwnerUsername] = useState('admin'); // Default as per API
+  const [availableTonnage, setAvailableTonnage] = useState('');
+  const [availableVolume, setAvailableVolume] = useState('');
+  const [bodyType, setBodyType] = useState('');
+  const [height, setHeight] = useState('');
+  const [length, setLength] = useState('');
+  const [width, setWidth] = useState('');
+  const [weight, setWeight] = useState('');
+  const [vehicleCategory, setVehicleCategory] = useState('');
+  const [loadingMethod, setLoadingMethod] = useState('');
+  const [transportationRateCurrency, setTransportationRateCurrency] = useState('UZS');
+  const [transportationRatePerKm, setTransportationRatePerKm] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
+  const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -239,8 +252,7 @@ function Haydovchilar() {
       setTransportData(result)
     })()
   }, []);
-
-
+  // console.log(transportData);
 
   // Tab Component
   function Tab({ id, label, badge, active }) {
@@ -273,21 +285,34 @@ function Haydovchilar() {
     { value: 'refrigerator', label: 'Refrijerator' }
   ];
 
+  // Vehicle category options for form
   const vehicleCategoryOptions = [
+    { value: '', label: 'Tanlang' },
     { value: 'truck', label: 'Yuk mashinasi' },
     { value: 'van', label: 'Furgon' },
-    { value: 'pickup', label: 'Pikap' },
     { value: 'refrigerator', label: 'Refrijerator' },
     { value: 'container', label: 'Konteyner' },
-    { value: 'trailer', label: 'Treyler' }
+    { value: 'platform', label: 'Platforma' },
+    { value: 'tanker', label: 'Sisterna' }
   ];
 
-  const driverStatusOptions = [
-    { value: 'online', label: 'Online' },
-    { value: 'offline', label: 'Offline' },
-    { value: 'busy', label: 'Band' },
-    { value: 'on_break', label: 'Dam olmoqda' },
-    { value: 'maintenance', label: 'Texnika xizmatida' }
+  // Body type options
+  const bodyTypeOptions = [
+    { value: '', label: 'Tanlang' },
+    { value: 'closed', label: 'Yopiq' },
+    { value: 'open', label: 'Ochiq' },
+  ];
+
+  // Loading method options
+  const loadingMethodOptions = [
+    { value: '', label: 'Tanlang' },
+    { value: 'top', label: 'Yuqoridan' },
+    { value: 'back', label: 'Orqadan' },
+  ];
+
+  // Currency options
+  const currencyOptions = [
+    { value: 'UZS', label: "So'm" },
   ];
 
   // Rating options
@@ -300,66 +325,82 @@ function Haydovchilar() {
   ];
 
   const handleAddDriver = async () => {
-    // Here you can add the logic to submit the form data
-    const newData = {
-      firstName,
-      lastName,
-      phoneNumber,
-      driverId,
-      vehicleCategory,
-      location,
-      email,
-      status,
-      licenseNumber,
-      registrationDate,
-      notes
+    // Prepare the data according to API structure
+    const formData = {
+      username: ownerFirstName,
+      password: password,
+      owner_first_name: ownerFirstName,
+      owner_last_name: ownerLastName,
+      owner_username: ownerUsername,
+      available_tonnage: availableTonnage ? parseFloat(availableTonnage) : null,
+      available_volume: availableVolume ? parseFloat(availableVolume) : null,
+      body_type: bodyType || null,
+      height: height || null,
+      length: length || null,
+      width: width || null,
+      weight: weight ? parseFloat(weight) : null,
+      vehicle_category: vehicleCategory || null,
+      loading_method: loadingMethod || null,
+      transportation_rate_currency: transportationRateCurrency || null,
+      transportation_rate_per_km: transportationRatePerKm ? parseFloat(transportationRatePerKm) : null,
+      public: isPublic,
+      phone_number: '1234',
+      photo: photo, // This should be handled as a file upload
     };
-    
-    // Close modal and show notification
-    setShowAddDriverModal(false);
-    setShowNotification(true);
-    
-    // Reset form
-    setFirstName('');
-    setLastName('');
-    setPhoneNumber('');
-    setDriverId('');
-    setVehicleCategory('truck');
-    setLocation('');
-    setEmail('');
-    setStatus('online');
-    setLicenseNumber('');
-    setRegistrationDate('');
-    setNotes('');
-    
-    // Hide notification after 3 seconds
-    setTimeout(() => setShowNotification(false), 3000);
 
-
+    console.log('Form data to be posted:', formData);
+    
     const token = "3e6927a8c5a99d414fe2ca5f2c2435edb6ada1ba";
     try {
-      const response = await fetch('https://tokennoty.pythonanywhere.com/api/transport/', {
+      const datab = JSON.stringify(formData)
+      const response = await fetch('https://tokennoty.pythonanywhere.com/api/users/', {
         method: 'POST',
         headers: {
-          // 'Content-Type': 'applicaton/json',
-          'Authentication': `token ${token}`
-          // Diqqat: FormData ishlatganda 'Content-Type': 'application/json' QO'YILMAYDI!
+          'Content-Type': 'application/json',
+          'Authorization': `token ${token}`
         },
-        body: newData,
+        body: datab,
       });
 
       if (response.ok) {
         alert("Yuk muvaffaqiyatli qo'shildi!");
         onRefresh(); // Ro'yxatni yangilash
         onClose();   // Modalni yopish
-        }//  else {
-      //   const errData = await response.json();
-      //   console.error("Server xatosi:", errData);
-      //   alert("Xatolik: " + (errData.detail || "Server qabul qilmadi (400)"));
-      // }
+        }
     } catch (err) {
       console.error("Tarmoq xatosi:", err);
-      alert("Server bilan aloqa yo'q yoki internet past.");
+      // alert("Server bilan aloqa yo'q yoki internet past.");
+    }
+
+    // Close modal and show notification
+    setShowAddDriverModal(false);
+    setShowNotification(true);
+    // Reset form
+    setOwnerFirstName('');
+    setOwnerLastName('');
+    setOwnerUsername('admin');
+    setAvailableTonnage('');
+    setAvailableVolume('');
+    setBodyType('');
+    setHeight('');
+    setLength('');
+    setWidth('');
+    setWeight('');
+    setVehicleCategory('');
+    setLoadingMethod('');
+    setTransportationRateCurrency('USD');
+    setTransportationRatePerKm('');
+    setIsPublic(false);
+    setPhoto(null);
+    
+    // Hide notification after 3 seconds
+    setTimeout(() => setShowNotification(false), 3000);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPhoto(file);
     }
   };
 
@@ -374,12 +415,12 @@ function Haydovchilar() {
             <p className="text-gray-600 text-lg">Barcha haydovchilarni boshqaring, kuzating va yuk biriktiring</p>
           </div>
 
-          {/* Stats Cards - Now only one div with one StatCard */}
+          {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <StatCard title="Jami Haydovchilar" value="1" trend="15%" trendUp={true} icon={FaUsers} gradient="from-blue-600 to-purple-700" />
+            <StatCard title="Jami Haydovchilar" value={transportData.length} trend="15%" trendUp={true} icon={FaUsers} gradient="from-blue-600 to-purple-700" />
             <StatCard title="Online" value="0" trend="8%" trendUp={true} icon={FaWifi} gradient="from-cyan-400 to-cyan-500" />
-            <StatCard title="Offline" value="1" trend="3%" trendUp={false} icon={FaUserSlash} gradient="from-yellow-500 to-orange-400" />
-            <StatCard title="Tasdiqlangan" value="1" trend="24%" trendUp={true} icon={FaCheckCircle} gradient="from-purple-700 to-blue-600" />
+            <StatCard title="Offline" value="0" trend="3%" trendUp={false} icon={FaUserSlash} gradient="from-yellow-500 to-orange-400" />
+            <StatCard title="Tasdiqlangan" value={transportData.length} trend="24%" trendUp={true} icon={FaCheckCircle} gradient="from-purple-700 to-blue-600" />
           </div>
 
           {/* Search and Filters */}
@@ -439,100 +480,76 @@ function Haydovchilar() {
       {/* Add Driver Modal */}
       <Modal isOpen={showAddDriverModal} title="Yangi haydovchi qo'shish" onClose={() => setShowAddDriverModal(false)}>
         <div className="space-y-4">
-          {/* Personal Information */}
+          {/* Owner Information */}
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
               <FaUser className="w-4 h-4" />
-              Shaxsiy ma'lumotlar
+              Haydovchi ma'lumotlari
             </h4>
             <div className="grid grid-cols-2 gap-3">
+            <div className='my-2'>
+                <label className="block text-xs text-gray-500 mb-1">Username *</label>
+                <input
+                  type="text"
+                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                  placeholder="Username"
+                  value={ownerUsername}
+                  onChange={(e) => setOwnerUsername(e.target.value)}
+                  required
+                />
+              </div>
+              <div className='my-2'>
+                <label className="block text-xs text-gray-500 mb-1">Password *</label>
+                <input
+                  type="password"
+                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                  placeholder="Parol"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Ism</label>
+                <label className="block text-xs text-gray-500 mb-1">Ism *</label>
                 <input
                   type="text"
                   className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                   placeholder="Ism"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  value={ownerFirstName}
+                  onChange={(e) => setOwnerFirstName(e.target.value)}
+                  required
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Familiya</label>
+                <label className="block text-xs text-gray-500 mb-1">Familiya *</label>
                 <input
                   type="text"
                   className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                   placeholder="Familiya"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
+                  value={ownerLastName}
+                  onChange={(e) => setOwnerLastName(e.target.value)}
+                  required
                 />
               </div>
             </div>
-          </div>
-
-          {/* Contact Information */}
-          <div>
-            <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <FaPhone className="w-4 h-4" />
-              Aloqa ma'lumotlari
-            </h4>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Telefon raqami</label>
-                <input
-                  type="tel"
-                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  placeholder="+998 XX XXX XX XX"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Email</label>
-                <input
-                  type="email"
-                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  placeholder="email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Driver Information */}
-          <div>
-            <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <FaIdCard className="w-4 h-4" />
-              Haydovchi ma'lumotlari
-            </h4>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Haydovchi ID</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  placeholder="DRV-001"
-                  value={driverId}
-                  onChange={(e) => setDriverId(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Gubernatorlik raqami</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  placeholder="AB1234567"
-                  value={licenseNumber}
-                  onChange={(e) => setLicenseNumber(e.target.value)}
-                />
-              </div>
-            </div>
+            {/* <div className="mt-3">
+              <label className="block text-xs text-gray-500 mb-1">Foydalanuvchi nomi</label>
+              <input
+                type="text"
+                className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                placeholder="admin"
+                value={ownerUsername}
+                onChange={(e) => setOwnerUsername(e.target.value)}
+              />
+            </div> */}
           </div>
 
           {/* Vehicle Information */}
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <FaCar className="w-4 h-4" />
+              <FaTruck className="w-4 h-4" />
               Transport ma'lumotlari
             </h4>
             <div className="space-y-3">
@@ -545,55 +562,176 @@ function Haydovchilar() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Joylashuv</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  placeholder="Shahar, tuman"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
+                <label className="block text-xs text-gray-500 mb-1">Kuzov turi</label>
+                <Select
+                  options={bodyTypeOptions}
+                  value={bodyType}
+                  onChange={(e) => setBodyType(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Yuklash usuli</label>
+                <Select
+                  options={loadingMethodOptions}
+                  value={loadingMethod}
+                  onChange={(e) => setLoadingMethod(e.target.value)}
                 />
               </div>
             </div>
           </div>
 
-          {/* Status and Date */}
+          {/* Dimensions */}
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <FaCalendarAlt className="w-4 h-4" />
-              Holat va sana
+              <FaRulerCombined className="w-4 h-4" />
+              O'lchamlari
+            </h4>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                  <FaRulerHorizontal className="w-3 h-3" /> Uzunlik (m)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                  placeholder="15.00"
+                  value={length}
+                  onChange={(e) => setLength(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                  <FaRulerVertical className="w-3 h-3" /> Balandlik (m)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                  placeholder="12.00"
+                  value={height}
+                  onChange={(e) => setHeight(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Kenglik (m)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                  placeholder="50.00"
+                  value={width}
+                  onChange={(e) => setWidth(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Capacity */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <FaWeight className="w-4 h-4" />
+              Sig'imi
             </h4>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Holat</label>
-                <Select
-                  options={driverStatusOptions}
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
+                <label className="block text-xs text-gray-500 mb-1">Og'irlik (kg) *</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                  placeholder="100"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  required
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Ro'yxatdan o'tgan sana</label>
+                <label className="block text-xs text-gray-500 mb-1">Mavjud tonnaj</label>
                 <input
-                  type="date"
+                  type="number"
+                  step="0.01"
                   className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  value={registrationDate}
-                  onChange={(e) => setRegistrationDate(e.target.value)}
+                  placeholder="Tonnaj"
+                  value={availableTonnage}
+                  onChange={(e) => setAvailableTonnage(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Mavjud hajm (m³)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                  placeholder="Hajm"
+                  value={availableVolume}
+                  onChange={(e) => setAvailableVolume(e.target.value)}
                 />
               </div>
             </div>
           </div>
 
-          {/* Additional Notes */}
+          {/* Pricing */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Qo'shimcha ma'lumotlar</label>
-            <textarea
-              className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-              rows="3"
-              placeholder="Qo'shimcha ma'lumotlar..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-            />
+            <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <FaDollarSign className="w-4 h-4" />
+              Narxlar
+            </h4>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Valyuta</label>
+                <Select
+                  options={currencyOptions}
+                  value={transportationRateCurrency}
+                  onChange={(e) => setTransportationRateCurrency(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Narx (1 km uchun)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                  placeholder="0.00"
+                  value={transportationRatePerKm}
+                  onChange={(e) => setTransportationRatePerKm(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Photo Upload */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <FaCube className="w-4 h-4" />
+              Rasm
+            </h4>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Transport rasmi</label>
+              <input
+                type="file"
+                className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                onChange={handleFileChange}
+                accept="image/*"
+              />
+            </div>
+          </div>
+
+          {/* Privacy Setting */}
+          <div className="flex items-center justify-between p-3 border border-gray-200 rounded-xl">
+            <div>
+              <div className="font-medium text-sm text-gray-700">Ommaviy transport</div>
+              <div className="text-xs text-gray-500">Bu transport barcha foydalanuvchilar uchun ko'rinadi</div>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
           </div>
 
           {/* Action Buttons */}
@@ -668,6 +806,7 @@ function Haydovchilar() {
           </div>
         </div>
       </Modal>
+
       {/* Notification */}
       {showNotification && (
         <div className="fixed top-6 right-6 p-4 rounded-xl shadow-lg z-50 flex items-center gap-3 bg-green-500 text-white animate-slide-in">

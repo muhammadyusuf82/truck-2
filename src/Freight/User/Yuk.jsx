@@ -12,7 +12,218 @@ import { IoIosSearch } from "react-icons/io";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaFlagCheckered } from "react-icons/fa";
 import { GoDotFill } from "react-icons/go";
+import { FaTimes } from "react-icons/fa";
+import { FaCloudUploadAlt } from "react-icons/fa";
 import chart_img from '../User/images/chart.png'
+
+// Token olish funksiyasi
+const getAuthToken = async () => {
+  const token = "3e6927a8c5a99d414fe2ca5f2c2435edb6ada1ba";
+  try {
+    const response = await fetch('https://tokennoty.pythonanywhere.com/api/token/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Token 3e6927a8c5a99d414fe2ca5f2c2435edb6ada1ba`
+      },
+      body: JSON.stringify({
+        password: "123",
+        phone_number: "+998993967336"
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Token API javobi:', data); // Debug uchun
+      // Token qaytarilgan formatga qarab, token ni olish
+      const token = data.token || data.access_token || data.access || data.accessToken || data.access_token || (data.data && data.data.token) || (data.data && data.data.access_token);
+      if (token) {
+        localStorage.setItem('access_token', token);
+        console.log('Token saqlandi:', token.substring(0, 20) + '...'); // Debug uchun
+        return token;
+      } else {
+        console.error('Token topilmadi. API javobi:', data);
+      }
+    } else {
+      const errorText = await response.text();
+      console.error('Token olishda xatolik:', response.status, response.statusText, errorText);
+    }
+  } catch (error) {
+    console.error('Token olishda tarmoq xatosi:', error);
+  }
+  return null;
+};
+
+const CargoModal = ({ isOpen, onClose, onRefresh }) => {
+  const [loading, setLoading] = useState(false);
+
+  if (!isOpen) return null;
+
+  // FormData yaratish funksiyasi
+  const createFormData = (form) => {
+    const formData = new FormData();
+    formData.append('title', form.title.value);
+
+    const description = `
+      Qayerdan: ${form.from_loc.value}
+      Qayerga: ${form.to_loc.value}
+      Narx: ${form.price.value} so'm
+      Og'irlik: ${form.weight.value} kg
+      Hajm: ${form.volume.value} m3
+      Qo'shimcha: ${form.content.value}
+    `;
+    // const description = {}
+    
+    // const content=
+    formData.append('content', description);
+    formData.append('route_starts_where_lat', 100)
+    formData.append('route_starts_where_lon', 100)
+    formData.append('freight_type', 'newfreight')
+    // formData.append('route_starts_where_lat', 100)
+
+    if (form.image.files[0]) {
+      formData.append('image', form.image.files[0]);
+    }
+    return formData;
+  };
+
+  // API so'rov yuborish funksiyasi
+  const sendRequest = async (token, formData) => {
+    return await fetch('https://tokennoty.pythonanywhere.com/api/freight/', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token 3e6927a8c5a99d414fe2ca5f2c2435edb6ada1ba`
+      },
+      body: formData,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    // Avval tokenni tekshirish va olish
+    let token = localStorage.getItem('access_token');
+    console.log('Mavjud token:', token ? token.substring(0, 20) + '...' : 'yo\'q'); // Debug uchun
+    
+    if (!token) {
+      console.log('Token yo\'q, yangi token olinmoqda...');
+      token = await getAuthToken();
+    }
+    
+    if (!token) {
+      alert("Token olishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.");
+      setLoading(false);
+      return;
+    }
+    
+    console.log('Ishlatilayotgan token:', token.substring(0, 20) + '...'); // Debug uchun
+
+    const form = e.target;
+    const formData = createFormData(form);
+
+    try {
+      const response = await sendRequest(token, formData);
+
+      if (response.ok) {
+        alert("Yuk muvaffaqiyatli qo'shildi!");
+        onRefresh(); // Ro'yxatni yangilash
+        onClose();   // Modalni yopish
+        form.reset(); // Formani tozalash
+      } else if (response.status === 401) {
+        // 401 xatosi bo'lsa, yangi token olish va qayta urinish
+        console.log('401 xatosi, yangi token olinmoqda...');
+        localStorage.removeItem('access_token'); // Eski tokenni o'chirish
+        const newToken = await getAuthToken();
+        if (newToken) {
+          // FormData ni qayta yaratish (chunki bir marta o'qilgandan keyin bo'sh bo'lib qoladi)
+          const retryFormData = createFormData(form);
+          // Yangi token bilan qayta urinish
+          const retryResponse = await sendRequest(newToken, retryFormData);
+          
+          if (retryResponse.ok) {
+            alert("Yuk muvaffaqiyatli qo'shildi!");
+            onRefresh();
+            onClose();
+            form.reset();
+          } else {
+            const errData = await retryResponse.json().catch(() => ({}));
+            alert("Xatolik: " + (errData.detail || errData.message || `${retryResponse.status} ${retryResponse.statusText}`));
+          }
+        } else {
+          alert("Token olishda xatolik. Iltimos, qayta urinib ko'ring.");
+        }
+      } else {
+        // 404 yoki boshqa xatolik bo'lganda JSON parse qilishga urinmaslik
+        let errorMessage = `Xatolik: ${response.status} ${response.statusText}`;
+        try {
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const errData = await response.json();
+            errorMessage = "Xatolik: " + (errData.detail || errData.message || `${response.status} ${response.statusText}`);
+          } else {
+            const text = await response.text();
+            console.error("Server javobi (JSON emas):", text);
+          }
+        } catch (parseErr) {
+          console.error("Xatolikni parse qilishda muammo:", parseErr);
+        }
+        console.error("Server xatosi:", errorMessage);
+        alert(errorMessage);
+      }
+    } catch (err) {
+      console.error("Tarmoq xatosi:", err);
+      alert("Server bilan aloqa yo'q yoki internet past.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <h2 className="text-xl font-bold text-slate-800">Yangi Yuk Qo'shish</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 cursor-pointer">
+            <FaTimes size={20} />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Yuk nomi *</label>
+            <input name="title" required className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee]" placeholder="Masalan: Meva" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-sm font-bold text-slate-700 mb-1">Qayerdan *</label><input name="from_loc" required className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee]" /></div>
+            <div><label className="block text-sm font-bold text-slate-700 mb-1">Qayerga *</label><input name="to_loc" required className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee]" /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-sm font-bold text-slate-700 mb-1">Og'irlik (kg)</label><input name="weight" type="number" required className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee]" /></div>
+            <div><label className="block text-sm font-bold text-slate-700 mb-1">Hajm (m³)</label><input name="volume" type="number" required className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee]" /></div>
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Narx (so'm)</label>
+            <input name="price" type="number" required className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee]" />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Qo'shimcha</label>
+            <textarea name="content" className="w-full border border-gray-200 rounded-xl p-3 outline-[#4361ee] h-20"></textarea>
+          </div>
+          <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center">
+            <input type="file" name="image" className="hidden" id="fileup" accept="image/*" />
+            <label htmlFor="fileup" className="cursor-pointer flex flex-col items-center gap-2 text-gray-500 hover:text-blue-600">
+              <FaCloudUploadAlt size={24} /> <span>Rasm yuklash</span>
+            </label>
+          </div>
+          <button type="submit" disabled={loading} className="w-full py-3 bg-[#4361ee] text-white rounded-xl font-bold hover:bg-blue-700 transition-all cursor-pointer">
+            {loading ? 'Joylanmoqda...' : 'Yukni Joylash'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const Yuk = () => {
   const tabs = [
     "Barcha Yuklar",
@@ -23,24 +234,38 @@ const Yuk = () => {
     "Mening Yuklarim",
   ];
   const [activeTab, setActiveTab] = useState(tabs[0]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const url_freight = 'https://tokennoty.pythonanywhere.com/api/freight/'
   const [data, setData] = useState([])
+  
+  // Component mount bo'lganda token olish
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const res = await fetch(url_freight)
-        const freight = await res.json()
-        const freightWithDestination = await Promise.all(
-          freight.map(async (item) => {
-            const res = await fetch(`https://tokennoty.pythonanywhere.com/api/freight/${item.id}/destinations`);
-            const destination = await res.json();
-            return {...item, destination}
-          }))
-          setData(freightWithDestination)
-        } catch (error) {
-          console.log(error);
-        }
-    }
+    const initializeToken = async () => {
+      const existingToken = localStorage.getItem('access_token');
+      if (!existingToken) {
+        await getAuthToken();
+      }
+    };
+    initializeToken();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const res = await fetch(url_freight)
+      const freight = await res.json()
+      const freightWithDestination = await Promise.all(
+        freight.map(async (item) => {
+          const res = await fetch(`https://tokennoty.pythonanywhere.com/api/freight/${item.id}/destinations`);
+          const destination = await res.json();
+          return {...item, destination}
+        }))
+        setData(freightWithDestination)
+      } catch (error) {
+        console.log(error);
+      }
+  }
+
+  useEffect(() => {
     loadData()
   }, [])
   console.log(data);
@@ -153,7 +378,13 @@ const Yuk = () => {
           <option className='items-center flex'>Oxirgi yil</option>
         </select>
         <div>
-          <button className='bg-blue-700 text-white p-2 rounded-lg hover:-translate-y-1 duration-200 transition-all'>+ Yangi yuk</button>
+          <button 
+          type='button'
+            onClick={() => setIsModalOpen(true)}
+            className='bg-blue-700 text-white p-2 rounded-lg hover:-translate-y-1 duration-200 transition-all'
+          >
+            + Yangi yuk
+          </button>
         </div>
       </form>
       <div className="flex items-center flex-wrap gap-y-4 px-1 my-10">
@@ -215,6 +446,11 @@ const Yuk = () => {
       <div className="py-10"></div>
     </div>
     <Footer />
+    <CargoModal
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      onRefresh={loadData}
+    />
   </div>)
 }
 

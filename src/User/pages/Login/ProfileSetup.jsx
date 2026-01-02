@@ -32,8 +32,8 @@ const ProfileSetup = () => {
   
 
   return (
-    <div className='main-bg min-h-screen'>
-      <div className="Container mx-auto py-10">
+    <div className='main-bg min-h-screen min-w-full'>
+      <div className="container mx-auto py-10">
         <div className="rounded-t-2xl main-bg text-center py-8 px-7 text-white w-3/4 md:w-5/9 lg:w-4/9 m-auto shadow-md">
           <h1 className='text-3xl items-center flex justify-center font-medium'><span className='p-2 mx-2 bg-white/20 rounded-2xl'><FaTruckLoading className='inline mx-2' /></span> Yuk.uz</h1>
           <div className="overflow-hidden w-full bg-white/10 h-2 my-6 rounded-2xl">
