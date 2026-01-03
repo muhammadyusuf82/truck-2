@@ -14,6 +14,8 @@ const Navbar = () => {
     { name: 'FAQ', id: 'faq' },
   ];
 
+  const isLoggedIn = Boolean(localStorage.getItem('token'))
+
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 150;
@@ -78,7 +80,9 @@ const Navbar = () => {
         <div className="hidden lg:flex gap-4">
           {/* <Link to={'/freight/asosiy'}><button className='text-[#4361ee] text-base font-semibold border-2 border-[#4361ee] rounded-lg py-2 px-5 hover:bg-[#4361ee] hover:text-white duration-300 cursor-pointer'>Dashboard</button></Link> */}
           <Link to={'/login'}>
-          <button className='bg-[#4361ee] text-white text-base font-semibold border-2 border-[#4361ee] rounded-lg py-2 px-5 hover:bg-white hover:text-[#4361ee] duration-300 cursor-pointer'>Royxtdan o'tish</button>
+            { !isLoggedIn &&
+              <button className='bg-[#4361ee] text-white text-base font-semibold border-2 border-[#4361ee] rounded-lg py-2 px-5 hover:bg-white hover:text-[#4361ee] duration-300 cursor-pointer'>Royxtdan o'tish</button>
+            }
           </Link>
         </div>
 
