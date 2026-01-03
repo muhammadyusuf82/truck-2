@@ -248,7 +248,6 @@ const Home = () => {
   return (
     <div ref={sectionRef}>
       <Navbar />
-
       <section id="home" className="bg-[#f6f5fc] py-8 sm:py-12">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12 lg:gap-16">

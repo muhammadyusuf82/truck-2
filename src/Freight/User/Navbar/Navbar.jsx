@@ -21,7 +21,7 @@ const Navbar = () => {
           <NavLink to='/freight/xarita' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Xarita</NavLink>
           <NavLink to='/freight/narxlar' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Narxlar</NavLink>
           <NavLink to='/freight/yordam' className={({isActive})=>`${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`}>Yordam</NavLink>
-          <NavLink to={'/profile-setup'} className='text-2xl bg-linear-to-br from-[#4361ee] to-[#7209b7] text-white py-2 px-2.5 cursor-pointer rounded-full'>AS</NavLink>
+          <NavLink to={'/profile-setup'} className='text-xl bg-linear-to-br from-[#4361ee] to-[#7209b7] text-white py-2 px-2.5 cursor-pointer rounded-full'>AS</NavLink>
         </ul>
         <div className="lg:hidden text-2xl text-[#4361ee] cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <FaTimes /> : <FaBars />}
@@ -32,11 +32,11 @@ const Navbar = () => {
           <hr />
           <div className="flex flex-col gap-3">
             <ul className="flex flex-col text-center gap-y-3 list-none mx-auto">
-              <li className='tex-lg font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Asosiy</li>
-              <li className='text-lg font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Haydovchilar</li>
-              <li className='tex-lg font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Xarita</li>
-              <li className='tex-lg font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Narxlar</li>
-              <li className='tex-lg font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Yordam</li>
+              <NavLink to='/freight/asosiy' className='tex-lg font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Asosiy</NavLink>
+              <NavLink to='/freight/haydovchilar' className='text-lg font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Haydovchilar</NavLink>
+              <NavLink to='/freight/yuk' className='tex-lg font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Xarita</NavLink>
+              <NavLink to='/freight/narxlar' className='tex-lg font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Narxlar</NavLink>
+              <NavLink to='/freight/yordam' className='tex-lg font-semibold cursor-pointer duration-300 rounded-xl hover:text-white text-gray-600 px-4 py-2 transition-all hover:bg-[#4361ee]'>Yordam</NavLink>
             </ul>
           </div>
         </ul>

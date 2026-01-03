@@ -10,6 +10,7 @@ import Haydovchilar from './Freight/User/Haydovchilar'
 import Yordam from './Freight/User/Yordam'
 import Map from './Freight/User/Map'
 import Narxlar from './Freight/User/Narxlar'
+import Admin from './User/components/SuperUser/Admin'
 function App() {
   return (
     <>
@@ -23,6 +24,7 @@ function App() {
       <Route path='/freight/yordam' element={<Yordam/>}/>
       <Route path='/freight/narxlar' element={<Narxlar/>}/>
       <Route path='/profile-setup' element={<ProfileSetup/>}/>
+      <Route path='/admin' element={<Admin/>}/>
     </Routes>
       {/* <Home/> */}
       {/* <Login/> */}

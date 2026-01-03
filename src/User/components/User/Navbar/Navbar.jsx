@@ -76,9 +76,9 @@ const Navbar = () => {
         </ul>
 
         <div className="hidden lg:flex gap-4">
-          <Link to={'/freight/asosiy'}><button className='text-[#4361ee] text-base font-semibold border-2 border-[#4361ee] rounded-lg py-2 px-5 hover:bg-[#4361ee] hover:text-white duration-300 cursor-pointer'>Dashboard</button></Link>
+          {/* <Link to={'/freight/asosiy'}><button className='text-[#4361ee] text-base font-semibold border-2 border-[#4361ee] rounded-lg py-2 px-5 hover:bg-[#4361ee] hover:text-white duration-300 cursor-pointer'>Dashboard</button></Link> */}
           <Link to={'/login'}>
-          <button className='bg-[#4361ee] text-white text-base font-semibold border-2 border-[#4361ee] rounded-lg py-2 px-5 hover:bg-white hover:text-[#4361ee] duration-300 cursor-pointer'>Chiqish</button>
+          <button className='bg-[#4361ee] text-white text-base font-semibold border-2 border-[#4361ee] rounded-lg py-2 px-5 hover:bg-white hover:text-[#4361ee] duration-300 cursor-pointer'>Royxtdan o'tish</button>
           </Link>
         </div>
 
@@ -90,8 +90,7 @@ const Navbar = () => {
       <div className={`fixed top-20 left-0 w-full bg-white shadow-xl transition-all duration-300 lg:hidden overflow-hidden ${isOpen ? 'max-h-125 border-b' : 'max-h-0'}`}>
         <ul className='flex flex-col p-5 gap-4'>
           {navLinks.map((link) => (
-            <li
-              key={link.id}
+            <li key={link.id}
               onClick={() => scrollToSection(link.id)}
               className={`text-lg font-semibold ${activeSection === link.id ? 'text-[#4361ee]' : 'text-gray-600'}`}
             >
@@ -100,8 +99,8 @@ const Navbar = () => {
           ))}
           <hr />
           <div className="flex flex-col gap-3">
-            <button className='w-full text-[#4361ee] border-2 border-[#4361ee] rounded-lg py-2 font-semibold'>Dashboard</button>
-            <button className='w-full bg-[#4361ee] text-white rounded-lg py-2 font-semibold'>Chiqish</button>
+            {/* <button className='w-full text-[#4361ee] border-2 border-[#4361ee] rounded-lg py-2 font-semibold'>Dashboard</button> */}
+            <button className='w-full bg-[#4361ee] text-white rounded-lg py-2 font-semibold'>Royxatdan o'tish</button>
           </div>
         </ul>
       </div>

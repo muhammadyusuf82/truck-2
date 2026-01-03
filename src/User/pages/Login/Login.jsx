@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { Router, redirect, useNavigate } from 'react-router-dom';
 import {
   FaTruckLoading,
   FaFacebook,
@@ -13,6 +13,8 @@ import {
   FaBox,
 } from "react-icons/fa";
 import { RiCheckboxCircleFill } from "react-icons/ri";
+import { Link } from 'react-router-dom';
+const baseUrl = 'https://region-raymond-consisting-agents.trycloudflare.com/'
 
 const Login = () => {
   const [counter, setCounter] = useState(0)
@@ -158,6 +160,7 @@ const Login = () => {
       invalidCredentials: "Invalid phone number or password"
     },
   };
+  
 
   useEffect(() => {
     if (language) {
@@ -204,9 +207,7 @@ const Login = () => {
       return formData.phone.length === 9 && formData.password.trim() !== '';
     } else {
       // For registration, need all fields
-      const baseValidation = formData.phone.length === 9 && 
-                           formData.password.trim() !== '' && 
-                           formData.confirmPassword.trim() !== '';
+      const baseValidation = formData.phone.length === 9 && formData.password.trim() !== '' && formData.confirmPassword.trim() !== '';
       const passwordMatch = formData.password === formData.confirmPassword;
       return baseValidation && passwordMatch;
     }
@@ -226,7 +227,7 @@ const Login = () => {
         password: password
       };
 
-      const response = await fetch('https://tokennoty.pythonanywhere.com/api/token/', {
+      const response = await fetch(baseUrl+'api/token/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -247,17 +248,8 @@ const Login = () => {
       }
 
       // Store tokens based on response format
-      if (responseData.access) {
-        localStorage.setItem('access_token', responseData.access);
-      }
-      if (responseData.refresh) {
-        localStorage.setItem('refresh_token', responseData.refresh);
-      }
       if (responseData.token) {
-        localStorage.setItem('access_token', responseData.token);
-      }
-      if (responseData.key) {
-        localStorage.setItem('access_token', responseData.key);
+        localStorage.setItem('token', responseData.token);
       }
 
       return responseData;
@@ -280,7 +272,7 @@ const Login = () => {
       password: data.password
     };
 
-    const response = await fetch('https://tokennoty.pythonanywhere.com/api/users/', {
+    const response = await fetch(baseUrl+'api/users/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -303,6 +295,20 @@ const Login = () => {
       }
       throw new Error(`Registration failed with status: ${response.status}`);
     }
+
+    const get_token = await fetch(baseUrl+'api/token/',{
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        phone_number:`+998${data.phone}`,
+        password:data.password
+      }
+        
+      )
+    })
+    const res = await get_token.json();
+    localStorage.setItem('token', res.token)
+    console.log(res);
 
     return responseData;
   };
@@ -344,7 +350,7 @@ const Login = () => {
           role: job,
           language: language
         }));
-        
+        navigate('/freight/asosiy');
       } else {
         // REGISTRATION FLOW
         const submitData = {
@@ -355,26 +361,10 @@ const Login = () => {
         };
         
         await performRegistration(submitData);
+        // Navigate after success
         setSuccess(t('successRegister'));
-        
-        // Auto-login after successful registration
-        try {
-          await performLogin(cleanedPhone, formData.password);
-          localStorage.setItem('user', JSON.stringify({
-            phone: `+998${cleanedPhone}`,
-            role: job,
-            language: language
-          }));
-        } catch (loginError) {
-          console.log('Auto-login failed, user can login manually:', loginError.message);
-          // Don't throw error here - registration was successful
-        }
+        navigate('/profile-setup');
       }
-      
-      // Navigate after success
-      setTimeout(() => {
-        navigate('/freight/asosiy');
-      }, 1500);
       
     } catch (error) {
       console.error('Submit error:', error);
@@ -619,6 +609,7 @@ const Login = () => {
             
             {/* SUBMIT BUTTON */}
             <div className='flex my-2 justify-center rounded-xl bg-blue-700 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg'>
+              {/* <Link to='/profile-setup' > */}
               <button 
                 type="submit" 
                 disabled={!validateForm() || loading}
@@ -636,6 +627,7 @@ const Login = () => {
                   </>
                 )}
               </button>
+              {/* </Link> */}
             </div>
             
             <div className="flex justify-center items-center gap-x-3 my-4">
