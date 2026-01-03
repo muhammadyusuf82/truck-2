@@ -44,7 +44,7 @@ import {
   FaUserCircle,
   FaSignOutAlt
 } from 'react-icons/fa';
-
+const baseUrl = 'https://tokennoty.pythonanywhere.com/'
 const YukAdminPanel = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -54,6 +54,20 @@ const YukAdminPanel = () => {
     confirm: false
   });
   const [toasts, setToasts] = useState([]);
+
+  const [users, setUsers] = useState([])
+  const token = localStorage.getItem('token')
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(baseUrl+'api/users-admin/', {
+        'headers': {
+          'Authorization': 'Token ' + token
+        }
+      })
+      setUsers(await response.json())
+    }
+    fetchData()
+  }, [])
 
   // Stats data
   const stats = [
@@ -470,12 +484,12 @@ const YukAdminPanel = () => {
                 <h2 className="text-2xl font-bold text-gray-900">Foydalanuvchilar Boshqaruvi</h2>
                 <p className="text-gray-600">Barcha foydalanuvchilarni boshqarish</p>
               </div>
-              <button 
+              {/* <button 
                 className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:shadow-lg transition-shadow flex items-center justify-center"
                 onClick={() => openModal('addUser')}
               >
                 <FaPlus className="mr-2" /> Yangi Foydalanuvchi
-              </button>
+              </button> */}
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -497,40 +511,48 @@ const YukAdminPanel = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-t border-gray-200 hover:bg-gray-50">
-                      <td className="p-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                            AK
-                          </div>
-                          <div>
-                            <div className="font-medium text-gray-900">Akmal Karimov</div>
-                            <div className="text-sm text-gray-500">akmal@example.com</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 text-sm text-gray-600">+998 90 123 45 67</td>
-                      <td className="p-4">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-green-600 bg-green-50">
-                          Yuk Beruvchi
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-green-600 bg-green-50">
-                          Faol
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex space-x-2">
-                          <button className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                            <FaEdit />
-                          </button>
-                          <button className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                            <FaTrash />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+
+                    { users.map((user, index) => {
+                      return (
+                        <tr className="border-t border-gray-200 hover:bg-gray-50" key={user.username}>
+                          <td className="p-4">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                {user.first_name.slice(0,1)}{user.last_name.slice(0,1)}
+                              </div>
+                              <div>
+                                <div className="font-medium text-gray-900">{ user.first_name ? `${user.first_name} ${user.last_name}` : user.phone_number }</div>
+                                <div className="text-sm text-gray-500">{ user.email || 'no email' }</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-4 text-sm text-gray-600">{ user.phone_number }</td>
+                          <td className="p-4">
+                            <span className={
+                              `inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${user.role ? 'text-green-500 bg-green-50' : 'text-gray-400'}`
+                            }>
+                              { user.role || 'not specified' }
+                            </span>
+                          </td>
+                          <td className="p-4">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-green-600 bg-green-50">
+                              Faol
+                            </span>
+                          </td>
+                          <td className="p-4">
+                            <div className="flex space-x-2">
+                              <button disabled className="w-8 h-8 cursor-not-allowed flex items-center justify-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                <FaEdit />
+                              </button>
+                              <button disabled className="w-8 h-8 cursor-not-allowed flex items-center justify-center text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                <FaTrash />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    }) }
+
                   </tbody>
                 </table>
               </div>
