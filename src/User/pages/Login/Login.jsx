@@ -14,7 +14,7 @@ import {
 } from "react-icons/fa";
 import { RiCheckboxCircleFill } from "react-icons/ri";
 import { Link } from 'react-router-dom';
-const baseUrl = 'https://region-raymond-consisting-agents.trycloudflare.com/'
+const baseUrl = 'https://tokennoty.pythonanywhere.com/'
 
 const Login = () => {
   const [counter, setCounter] = useState(0)

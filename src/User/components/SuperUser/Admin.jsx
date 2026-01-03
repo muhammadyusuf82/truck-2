@@ -328,7 +328,7 @@ const YukAdminPanel = () => {
                       {stat.trendValue}%
                     </span>
                   </div>
-                  <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{stat.title === 'Umumiy Daromad' ? formatCurrency(stat.value) : stat.value.toLocaleString()}</div>
+                  <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1 truncate">{stat.title === 'Umumiy Daromad' ? formatCurrency(stat.value) : stat.value.toLocaleString()}</div>
                   <div className="text-sm text-gray-600">{stat.title}</div>
                 </div>
               ))}

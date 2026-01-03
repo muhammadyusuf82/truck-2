@@ -13,7 +13,7 @@ import {
 } from 'react-icons/fa';
 import { GiCheckMark } from "react-icons/gi";
 import { BsFillFuelPumpFill } from "react-icons/bs";
-const baseUrl = 'https://region-raymond-consisting-agents.trycloudflare.com/'
+const baseUrl = 'https://tokennoty.pythonanywhere.com/'
 const ProfileSetup = () => {
   // States
   const [counter, setCounter] = useState(0);
