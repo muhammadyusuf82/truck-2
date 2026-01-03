@@ -48,8 +48,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className='h-20 flex items-center bg-white shadow-md sticky top-0 z-50'>
-      <div className="container mx-auto px-4 sm:px-0 flex items-center justify-between">
+    <nav className='h-20 flex items-center bg-white shadow-md sticky top-0 z-50 px-10'>
+      <div className="w-7xl mx-auto px-4 sm:px-0 flex items-center justify-between">
 
         <div className="flex gap-3 items-center cursor-pointer duration-300 transform hover:scale-105" onClick={() => scrollToSection('home')}>
           <div className="w-10 h-10 rounded-lg flex items-center bg-linear-to-br from-[#4361ee] to-[#7209b7]">
